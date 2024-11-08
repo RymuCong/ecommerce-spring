@@ -33,8 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth->auth.
-                        requestMatchers(AppConstants.PUBLIC_URLS).permitAll()
+                .authorizeHttpRequests(auth->auth
+                        .requestMatchers(AppConstants.PUBLIC_URLS).permitAll()
                         .requestMatchers(AppConstants.ADMIN_URLS).hasAuthority("ADMIN")
                         .requestMatchers(AppConstants.USER_URLS).hasAnyAuthority("USER","ADMIN")
                         .anyRequest().authenticated())
@@ -57,12 +57,9 @@ public class SecurityConfig {
         return provider;
     }
 
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
 
 }
