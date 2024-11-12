@@ -1,6 +1,7 @@
 package com.arius.ecommerce.utils;
 
 import com.arius.ecommerce.dto.request.LoginRequest;
+import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -12,4 +13,7 @@ public interface CommonMapper {
 
      // Map user to login request
     LoginRequest toLoginRequest(User user);
+
+    // Map register request to user
+    User toUser(RegisterRequest registerRequest);
 }

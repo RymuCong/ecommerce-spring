@@ -22,12 +22,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Size(min = 5, max = 20, message = "First Name should be within 5 to 20 characters")
-    @Pattern(regexp = "^[a-zA-Z]*$",message = "First Name Should not contain any special characters or numbers")
+    @Size(min = 1, max = 20, message = "First Name should be within 1 to 20 characters")
+    @Pattern(regexp = "^[a-zA-Z ]*$",message = "First Name Should not contain any special characters or numbers")
     private String firstName;
 
-    @Size(min = 5, max = 20, message = "Last Name should be within 5 to 20 characters")
-    @Pattern(regexp = "^[a-zA-Z]*$",message = "Last Name Should not contain any special characters or numbers")
+    @Size(min = 1, max = 20, message = "Last Name should be within 1 to 20 characters")
+    @Pattern(regexp = "^[a-zA-Z ]*$",message = "Last Name Should not contain any special characters or numbers")
     private String lastName;
 
     @Size(min = 10, max = 10, message = "Mobile Number must be digits long")
@@ -52,4 +52,13 @@ public class User {
     @OneToOne(mappedBy = "user",cascade = {CascadeType.PERSIST,CascadeType.MERGE},orphanRemoval = true)
     private Cart cart;
 
+
+    // User.java
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + userId +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

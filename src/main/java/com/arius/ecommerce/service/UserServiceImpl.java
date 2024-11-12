@@ -62,10 +62,7 @@ public class UserServiceImpl implements UserService {
             return new AuthResponse(null, "User already exists with email " + registerRequest.getEmail());
         }
 
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
+        User user = CommonMapper.INSTANCE.toUser(registerRequest);
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         user.setPassword(encoder.encode(registerRequest.getPassword()));

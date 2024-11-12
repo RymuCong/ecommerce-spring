@@ -23,4 +23,13 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     List<User> users = new ArrayList<>();
+
+    // Role.java
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + roleId +
+                ", roleName='" + roleName + '\'' +
+                '}';
+    }
 }
