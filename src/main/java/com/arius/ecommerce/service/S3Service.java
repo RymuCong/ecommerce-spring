@@ -32,7 +32,7 @@ public class S3Service {
         this.s3Client = s3Client;
     }
 
-    public String uploadFile(MultipartFile file) {
+    public String uploadProductFile(MultipartFile file) {
         File localFile = null;
         try {
             String fileName = "products/images/" + file.getOriginalFilename();
@@ -120,13 +120,14 @@ public class S3Service {
         }
     }
 
-    public void deleteImage(String imageUrl) {
+    public void deleteProductImage(String imageUrl) {
         try {
             // Decode the URL from the database
             String decodedImageUrl = URLDecoder.decode(imageUrl, StandardCharsets.UTF_8);
+            String key = imageUrl.substring(decodedImageUrl.indexOf("products/images/"));
 
             // Delete the object from S3
-            s3Client.deleteObject(bucketName, "products/images/" + decodedImageUrl);
+            s3Client.deleteObject(bucketName, key);
         } catch (Exception e) {
             System.err.println("Error encoding/decoding URL: " + e.getMessage());
             e.printStackTrace();

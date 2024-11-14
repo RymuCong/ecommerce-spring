@@ -1,8 +1,12 @@
 package com.arius.ecommerce.controller;
 
+import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.ProductDTO;
+import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +32,38 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PostMapping("/public/products/update")
-    ResponseEntity<?> updateProduct(@RequestBody ProductDTO productDTO) {
-        ProductDTO updatedProduct = productService.updateProduct(productDTO);
-        return ResponseEntity.ok(updatedProduct);
+    @GetMapping("/public/products")
+    public ResponseEntity<ProductResponse> getAllProducts(
+            @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
+            @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
+            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
+            @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
+    ){
+        ProductResponse productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy,sortDir);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/public/products")
-    ResponseEntity<?> getAllProducts(@RequestParam("page") int page, @RequestParam("size") int size) {
-        return ResponseEntity.ok("All products");
+    @PutMapping("/public/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
+        ProductDTO productDTO = productService.updateProduct(productId,product);
+        return new ResponseEntity<>(productDTO,HttpStatus.OK);
+    }
+
+    @PutMapping("/public/products/{productId}/image")
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable("productId") Long productId, @RequestParam("image") MultipartFile image) {
+        ProductDTO productDTO = productService.updateProductImage(productId,image);
+        return new ResponseEntity<>(productDTO,HttpStatus.OK);
+    }
+
+    @GetMapping("/public/products/{productId}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long productId) {
+        Product product = productService.getProductById(productId);
+        return ResponseEntity.ok(product);
+    }
+
+    @DeleteMapping("/admin/products/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
+        String message = productService.deleteProduct(productId);
+        return ResponseEntity.ok(message);
     }
 }

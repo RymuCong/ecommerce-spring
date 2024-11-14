@@ -9,15 +9,17 @@ public interface ProductService {
 
     Product addProduct(Long categoryId, ProductDTO productDTO, MultipartFile image);
 
-    ProductResponse getAllProducts(int page, int size);
+    ProductResponse getAllProducts(int page, int size, String sortBy, String sortDir);
 
-    ProductDTO updateProduct(ProductDTO productDTO);
+    ProductDTO updateProduct(Long productId, Product product);
 
-    ProductDTO updateProductImage(Long productId, String imageUrl);
+    ProductDTO updateProductImage(Long productId, MultipartFile image);
 
     String deleteProduct(Long productId);
 
     ProductResponse getProductsByCategory(Long categoryId, int page, int size);
 
     ProductResponse searchByKeyword(String keyword, int page, int size);
+
+    Product getProductById(Long productId);
 }
