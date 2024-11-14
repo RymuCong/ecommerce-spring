@@ -16,4 +16,5 @@ public class ProductDTO {
     private Long price;
     private Double discount;
     private Long specialPrice;
+    private CategoryDTO category;
 }

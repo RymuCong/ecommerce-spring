@@ -8,7 +8,7 @@ public class AppConstants {
     public static final String SORT_ORDER_BY = "orderId";
     public static final String SORT_USER_BY = "userId";
     public static final String PAGE_NUMBER = "0";
-    public static final String PAGE_SIZE = "2";
+    public static final String PAGE_SIZE = "6";
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_USER = "USER";
     public static final String[] PUBLIC_URLS = {"/auth/register", "/auth/login", "/api/public/**"};

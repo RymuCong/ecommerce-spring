@@ -58,22 +58,27 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductResponse getAllProducts(int pageNumber, int pageSize, String sortBy, String sortDir) {
-        //Sorting
-        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
+        // Sorting
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        //Pagination
-        Pageable pageDetails = PageRequest.of(pageNumber,pageSize,sort);
+        // Pagination
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sort);
         Page<Product> pagedProducts = productRepository.findAll(pageDetails);
 
-        //Get Only Products from Paged Products
+        // Get Only Products from Paged Products
         List<Product> products = pagedProducts.getContent();
 
-        //Converting to Product DTO
-        List<ProductDTO> productDTO = products.stream().map(CommonMapper.INSTANCE::toProductDTO).toList();
+        // Converting to Product DTO and Category
+        List<ProductDTO> productDTOs = products.stream().map(product -> {
+            ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
+            if (product.getCategory() != null) {
+                productDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+            }
+            return productDTO;
+        }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setContent(productDTO);
+        productResponse.setContent(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
