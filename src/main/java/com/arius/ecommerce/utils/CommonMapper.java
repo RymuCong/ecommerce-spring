@@ -1,8 +1,10 @@
 package com.arius.ecommerce.utils;
 
+import com.arius.ecommerce.dto.CategoryDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
+import com.arius.ecommerce.entity.Category;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.entity.User;
 import org.mapstruct.Mapper;
@@ -24,4 +26,6 @@ public interface CommonMapper {
 
     // Map product dto to product
     Product toProduct(ProductDTO productDTO);
+
+    CategoryDTO toCategoryDTO(Category category);
 }

@@ -11,9 +11,9 @@ public class AppConstants {
     public static final String PAGE_SIZE = "2";
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_USER = "USER";
-    public static final String[] PUBLIC_URLS = {"/auth/register", "/auth/login"};
+    public static final String[] PUBLIC_URLS = {"/auth/register", "/auth/login", "/api/public/**"};
     public static final String[] ADMIN_URLS = {"/api/admin/**"};
-    public static final String[] USER_URLS = {"/api/public/**", "/api/products/update", "/api/products/add", "/api/products/delete"};
+    public static final String[] USER_URLS = {"/api/user/**"};
     public static final long JWT_VALIDITY = 1000 * 60 * 60; // 1 hour
 
 

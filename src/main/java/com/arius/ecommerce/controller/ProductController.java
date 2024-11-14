@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api")
 public class ProductController {
@@ -22,7 +23,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping(value = "/public/products/add",
+    @PostMapping(value = "/public/product/add",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Product> addProduct(@RequestPart("categoryId") String categoryId,
@@ -32,7 +33,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/public/products")
+    @GetMapping("/public/product")
     public ResponseEntity<ProductResponse> getAllProducts(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
@@ -43,25 +44,25 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @PutMapping("/public/products/{productId}")
+    @PutMapping("/public/product/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
         ProductDTO productDTO = productService.updateProduct(productId,product);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);
     }
 
-    @PutMapping("/public/products/{productId}/image")
+    @PutMapping("/public/product/{productId}/image")
     public ResponseEntity<ProductDTO> updateProductImage(@PathVariable("productId") Long productId, @RequestParam("image") MultipartFile image) {
         ProductDTO productDTO = productService.updateProductImage(productId,image);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);
     }
 
-    @GetMapping("/public/products/{productId}")
+    @GetMapping("/public/product/{productId}")
     public ResponseEntity<Product> getProductById(@PathVariable Long productId) {
         Product product = productService.getProductById(productId);
         return ResponseEntity.ok(product);
     }
 
-    @DeleteMapping("/admin/products/{productId}")
+    @DeleteMapping("/admin/product/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
         String message = productService.deleteProduct(productId);
         return ResponseEntity.ok(message);
