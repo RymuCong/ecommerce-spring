@@ -1,10 +1,12 @@
 package com.arius.ecommerce.security;
 
+import com.arius.ecommerce.config.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,24 +22,29 @@ import java.util.function.Function;
 @Service
 public class JwtUtils {
 
-    private String secretkey;
+    private final String secretKey;
 
-    public JwtUtils(){
-        secretkey = generateSecretKey();
+    public JwtUtils(@Value("${jwt.secretKey}") String secretKey) {
+        this.secretKey = secretKey;
     }
 
-    public String generateSecretKey(){
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-            SecretKey secretKey = keyGen.generateKey();
-            return Base64.getEncoder().encodeToString(secretKey.getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating secret key" + e);
-        }
-    }
+//    public JwtUtils(){
+//        secretKey = generateSecretKey();
+//        System.out.println("Secret key: " + secretKey);
+//    }
+//
+//    public String generateSecretKey(){
+//        try {
+//            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA512");
+//            SecretKey secretKey = keyGen.generateKey();
+//            return Base64.getEncoder().encodeToString(secretKey.getEncoded());
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException("Error generating secret key" + e);
+//        }
+//    }
 
     public SecretKey getKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretkey);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

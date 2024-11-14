@@ -1,4 +1,4 @@
-package com.arius.ecommerce.security;
+package com.arius.ecommerce.config;
 
 public class AppConstants {
 
@@ -13,7 +13,7 @@ public class AppConstants {
     public static final String ROLE_USER = "USER";
     public static final String[] PUBLIC_URLS = {"/auth/register", "/auth/login"};
     public static final String[] ADMIN_URLS = {"/api/admin/**"};
-    public static final String[] USER_URLS = {"/api/public/**"};
+    public static final String[] USER_URLS = {"/api/public/**", "/api/products/update", "/api/products/add", "/api/products/delete"};
     public static final long JWT_VALIDITY = 1000 * 60 * 30;
 
 

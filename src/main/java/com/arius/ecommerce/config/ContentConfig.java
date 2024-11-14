@@ -1,4 +1,4 @@
-package com.arius.ecommerce.security;
+package com.arius.ecommerce.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;

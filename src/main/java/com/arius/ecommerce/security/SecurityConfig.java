@@ -1,5 +1,6 @@
 package com.arius.ecommerce.security;
 
+import com.arius.ecommerce.config.AppConstants;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -39,9 +40,9 @@ public class SecurityConfig {
                         .requestMatchers(AppConstants.USER_URLS).hasAnyAuthority("USER","ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
-                .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
-                }))
+//                .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
+//                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,"BAD REQUEST");
+//                }))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
             http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
