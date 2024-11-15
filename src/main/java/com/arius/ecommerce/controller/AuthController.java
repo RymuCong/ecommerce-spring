@@ -2,6 +2,7 @@ package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
+import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.service.UserService;
 import jakarta.validation.Valid;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.Map;
 
+@CrossOrigin("*")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -34,5 +36,16 @@ public class AuthController {
     public ResponseEntity<?> registerHandler(@RequestBody RegisterRequest registerRequest){
         System.err.println("Register request: " + registerRequest);
         return ResponseEntity.ok(userService.registerUser(registerRequest));
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> loginAdmin(@RequestBody LoginRequest loginRequest) {
+        try {
+            System.err.println("Admin login request: " + loginRequest);
+            AuthResponse user = userService.loginUser(loginRequest);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 }

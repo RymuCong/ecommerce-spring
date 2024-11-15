@@ -1,7 +1,6 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.AddressDTO;
-import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.RoleDTO;
 import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.response.AuthResponse;

@@ -52,8 +52,6 @@ public class User {
     @OneToOne(mappedBy = "user",cascade = {CascadeType.PERSIST,CascadeType.MERGE},orphanRemoval = true)
     private Cart cart;
 
-
-    // User.java
     @Override
     public String toString() {
         return "User{" +
