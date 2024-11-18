@@ -1,12 +1,11 @@
 package com.arius.ecommerce.service;
 
-import com.arius.ecommerce.dto.AddressDTO;
-import com.arius.ecommerce.dto.RoleDTO;
-import com.arius.ecommerce.dto.UserDTO;
+import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.entity.CartItem;
 import com.arius.ecommerce.entity.Role;
 import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.exception.APIException;
@@ -40,13 +39,15 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final CartService cartService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, CartService cartService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.cartService = cartService;
     }
 
     @Override
@@ -156,14 +157,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User","userId",userId));
 
-//        List<CartItem> cartItems = user.getCart().getCartItems();
-//        Long cartId = user.getCart().getCartId();
-//
-//        cartItems.forEach(cartItem -> {
-//            Long productId = cartItem.getProduct().getProductId();
-//
-//            cartService.deleteProductFromCartUsingCartId(cartId,productId);
-//        });
+        List<CartItem> cartItems = user.getCart().getCartItems();
+        Long cartId = user.getCart().getCartId();
+
+        cartItems.forEach(cartItem -> {
+            Long productId = cartItem.getProduct().getProductId();
+
+            cartService.deleteProductFromCartUsingCartId(cartId,productId);
+        });
 
         userRepository.delete(user);
 
@@ -173,10 +174,10 @@ public class UserServiceImpl implements UserService {
     private static UserDTO getUserDTO(User user) {
         UserDTO userDTO = CommonMapper.INSTANCE.toUserDTO(user);
 
-//        CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(user.getCart());
+        CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(user.getCart());
 
-//        List<ProductDTO> productDTOS = user.getCart().getCartItems().stream()
-//                .map(item -> CommonMapper.INSTANCE.toProductDTO(item.getProduct())).toList();
+        List<ProductDTO> productDTOS = user.getCart().getCartItems().stream()
+                .map(item -> CommonMapper.INSTANCE.toProductDTO(item.getProduct())).toList();
 
         Set<RoleDTO> roleDTOS = user.getRoles().stream()
                 .map(CommonMapper.INSTANCE::toRoleDTO).collect(Collectors.toSet());
@@ -185,8 +186,8 @@ public class UserServiceImpl implements UserService {
                 CommonMapper.INSTANCE::toAddressDTO
         ).toList();
 
-//        userDTO.setCartDTO(cartDTO);
-//        userDTO.getCartDTO().setProducts(productDTOS);
+        userDTO.setCartDTO(cartDTO);
+        userDTO.getCartDTO().setProducts(productDTOS);
         userDTO.setRoles(roleDTOS);
         userDTO.setAddress(addressDTOS);
 

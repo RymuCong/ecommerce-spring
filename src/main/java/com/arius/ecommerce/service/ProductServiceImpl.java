@@ -2,6 +2,7 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.Category;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
@@ -30,12 +31,15 @@ public class ProductServiceImpl implements ProductService{
 
     private final S3Service s3Service;
 
+    private final CartService cartService;
+
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, S3Service s3Service) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, S3Service s3Service, CartService cartService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.cartRepository = cartRepository;
         this.s3Service = s3Service;
+        this.cartService = cartService;
     }
 
 
@@ -128,11 +132,11 @@ public class ProductServiceImpl implements ProductService{
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product","productId",productId));
 
-//        List<Cart> cart = cartRepository.findCartsByProductId(productId);
+        List<Cart> cart = cartRepository.findCartsByProductId(productId);
 
-//        cart.forEach(cart1 -> {
-//            cartService.deleteProductFromCartUsingCartId(cart1.getCartId(),productId);
-//        });
+        cart.forEach(cart1 -> {
+            cartService.deleteProductFromCartUsingCartId(cart1.getCartId(),productId);
+        });
 
         s3Service.deleteProductImage(product.getImage());
         productRepository.delete(product);

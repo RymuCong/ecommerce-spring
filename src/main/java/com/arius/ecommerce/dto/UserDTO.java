@@ -19,5 +19,5 @@ public class UserDTO {
     private String email;
     private Set<RoleDTO> roles;
     private List<AddressDTO> address;
-//    private CartDTO cartDTO;
+    private CartDTO cartDTO;
 }

@@ -1,5 +1,6 @@
 package com.arius.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart",cascade = {CascadeType.PERSIST,CascadeType.MERGE},orphanRemoval = true)
+    @JsonIgnore
     private List<CartItem> cartItems = new ArrayList<>();
 
     private Long totalPrice;

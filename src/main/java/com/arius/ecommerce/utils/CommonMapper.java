@@ -18,6 +18,8 @@ public interface CommonMapper {
     // Map register request to user
     User toUser(RegisterRequest registerRequest);
 
+    User toUser(UserDTO userDTO);
+
     // Map product to product dto
     ProductDTO toProductDTO(Product product);
 
@@ -31,4 +33,6 @@ public interface CommonMapper {
     RoleDTO toRoleDTO(Role role);
 
     AddressDTO toAddressDTO(Address address);
+
+    CartDTO toCartDTO(Cart cart);
 }
