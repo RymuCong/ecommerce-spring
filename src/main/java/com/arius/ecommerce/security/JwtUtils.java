@@ -1,7 +1,9 @@
 package com.arius.ecommerce.security;
 
 import com.arius.ecommerce.config.AppConstants;
+import com.arius.ecommerce.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,10 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,11 +60,16 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token){
-        return Jwts.parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token).getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token).getPayload();
+        } catch (ExpiredJwtException ex) {
+            throw new TokenExpiredException("JWT token has expired");
+        }
     }
+
 
     private <T> T extractClaim(String token, Function<Claims,T> claimsResolver){
         final Claims claims = extractAllClaims(token);
