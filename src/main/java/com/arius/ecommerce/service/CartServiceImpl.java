@@ -81,7 +81,7 @@ public class CartServiceImpl implements CartService{
 
         cartItemRepository.save(newCartItem);
 
-        product.setQuantity(product.getQuantity() - quantity);
+//        product.setQuantity(product.getQuantity() - quantity);
         cart.setTotalPrice(cart.getTotalPrice() + (newCartItem.getSpecialPrice() * quantity));
 
         productRepository.save(product);
@@ -160,7 +160,7 @@ public class CartServiceImpl implements CartService{
 
         if (product.getQuantity() < quantity) {
             throw new APIException("Please make an order " + product.getProductName() +
-                    " less than or equal to the quantity " + product.getQuantity());
+                    " less than or equal to the quantity  " + product.getQuantity());
         }
 
         CartItem cartItem = cartItemRepository.findCartItemByProductIAndCartId(cart.getCartId(), productId);
@@ -184,7 +184,7 @@ public class CartServiceImpl implements CartService{
         cart.setTotalPrice((long) (cartPrice + (cartItem.getSpecialPrice() * cartItemQuantity)));
         cartItemRepository.save(cartItem);
 
-        product.setQuantity(product.getQuantity() - quantity);
+//        product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
         cartRepository.save(cart);
 
@@ -230,8 +230,13 @@ public class CartServiceImpl implements CartService{
         cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getSpecialPrice() * cartItem.getQuantity()));
 
         Product product = cartItem.getProduct();
-        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+//        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
 
         cartItemRepository.deleteCartItemByProductIdAndCartId(cart.getCartId(),productId);
+    }
+
+    @Override
+    public Cart findByUserUserId(Long userId) {
+        return cartRepository.findByUserUserId(userId);
     }
 }

@@ -35,4 +35,8 @@ public interface CommonMapper {
     AddressDTO toAddressDTO(Address address);
 
     CartDTO toCartDTO(Cart cart);
+
+    OrderDTO toOrderDTO(Order order);
+
+    OrderItemDTO toOrderItemDTO(OrderItem orderItem);
 }

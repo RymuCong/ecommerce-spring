@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Data
 @Entity
@@ -19,10 +21,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
-    @OneToOne(mappedBy = "payment",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    private Order order;
+    @OneToMany(mappedBy = "payment",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    private List<Order> order;
 
     @NotBlank
-    @Size(min = 4,message = "Payment method name should be at least 3 characters")
+    @Size(min = 3,message = "Payment method name should be at least 3 characters")
     private String paymentMethod;
 }
