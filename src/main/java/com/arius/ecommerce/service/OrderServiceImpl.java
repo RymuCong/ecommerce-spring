@@ -136,12 +136,6 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = pagedOrders.getContent();
 
         List<OrderDTO> orderDTOS = orders.stream().map(CommonMapper.INSTANCE::toOrderDTO).toList();
-//        List<OrderDTO> orderDTOS = new ArrayList<>();
-//        for (Order order: orders){
-//            OrderDTO orderDTO = CommonMapper.INSTANCE.toOrderDTO(order);
-//            orderDTO.setTheOrderStatus(OrderStatus.valueOf(order.getOrderStatus().name()));
-//            orderDTOS.add(orderDTO);
-//        }
 
         if (orderDTOS.isEmpty()){
             throw new APIException("No Orders Placed yet");

@@ -14,7 +14,7 @@ public class AppConstants {
     public static final String[] PUBLIC_URLS = {"/api/auth/**", "/api/public/**"};
     public static final String[] ADMIN_URLS = {"/api/admin/**"};
     public static final String[] USER_URLS = {"/api/user/**"};
-    public static final long JWT_VALIDITY = 1000 * 60 * 60; // 1 hour
+    public static final long JWT_VALIDITY = 1000 * 60 * 60 * 5; // 5 hours
 
 
 }
