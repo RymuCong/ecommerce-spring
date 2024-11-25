@@ -23,7 +23,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping(value = "/public/product/add",
+    @PostMapping(value = "/admin/product/add",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Product> addProduct(@RequestPart("categoryId") String categoryId,
@@ -44,13 +44,13 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @PutMapping("/public/product/{productId}")
+    @PutMapping("/admin/product/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
         ProductDTO productDTO = productService.updateProduct(productId,product);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);
     }
 
-    @PutMapping("/public/product/{productId}/image")
+    @PutMapping("/admin/product/{productId}/image")
     public ResponseEntity<ProductDTO> updateProductImage(@PathVariable("productId") Long productId, @RequestParam("image") MultipartFile image) {
         ProductDTO productDTO = productService.updateProductImage(productId,image);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);

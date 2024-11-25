@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +19,5 @@ public class ProductDTO {
     private Double discount;
     private Long specialPrice;
     private CategoryDTO category;
+    private List<TagDTO> tags;
 }

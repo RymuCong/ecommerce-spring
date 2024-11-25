@@ -39,4 +39,8 @@ public interface CommonMapper {
     OrderDTO toOrderDTO(Order order);
 
     OrderItemDTO toOrderItemDTO(OrderItem orderItem);
+
+    Tag toTag(TagDTO tagDTO);
+
+    TagDTO toTagDTO(Tag tag);
 }

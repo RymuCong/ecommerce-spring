@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -35,7 +36,7 @@ public class S3Service {
     public String uploadProductFile(MultipartFile file) {
         File localFile = null;
         try {
-            String fileName = "products/images/" + file.getOriginalFilename();
+            String fileName = "products/images/" + UUID.randomUUID() + file.getOriginalFilename();
 
             // Convert MultipartFile to File
             localFile = convertMultiPartToFile(file);
