@@ -1,5 +1,6 @@
 package com.arius.ecommerce.service;
 
+import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.entity.Tag;
@@ -73,5 +74,26 @@ public class TagServiceImpl implements TagService{
             throw new APIException("Product not found " + productId);
         }
         return tagRepository.findTagsByProductsProductId(productId).stream().map(CommonMapper.INSTANCE::toTagDTO).toList();
+    }
+
+    @Override
+    public ProductDTO addTagToProduct(Long productId, TagDTO tagDTO) {
+        Product product = productRepository.findProductByProductId(productId);
+        if (product == null){
+            throw new APIException("Product not found " + productId);
+        }
+        Tag tag = tagRepository.findTagByTagId(tagDTO.getTagId());
+        if (tag == null){
+            tag = CommonMapper.INSTANCE.toTag(tagDTO);
+            tagRepository.save(tag);
+        }
+        // check if tag already exists
+        final Tag finalTag = tag;
+        if (product.getTags().stream().anyMatch(t -> t.getTagId().equals(finalTag.getTagId()))){
+            throw new APIException("Tag already exists in product");
+        }
+        product.getTags().add(tag);
+        productRepository.save(product);
+        return CommonMapper.INSTANCE.toProductDTO(product);
     }
 }

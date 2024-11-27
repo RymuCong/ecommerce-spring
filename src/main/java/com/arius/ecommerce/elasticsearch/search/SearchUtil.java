@@ -1,10 +1,10 @@
 package com.arius.ecommerce.elasticsearch.search;
 
-
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.apache.lucene.search.join.ScoreMode;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
@@ -19,14 +19,15 @@ public final class SearchUtil {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
         for (String field : searchRequestDTO.getFields()) {
-            boolQuery.should(QueryBuilders.matchQuery(field, searchRequestDTO.getSearchTerm()));
-        }
-
-        for (String field : searchRequestDTO.getFields()) {
             if ("category".equals(field)) {
-                boolQuery.should(QueryBuilders.termQuery("category.categoryName.keyword", searchRequestDTO.getSearchTerm()));
+                boolQuery.should(QueryBuilders.matchQuery("category.categoryName", searchRequestDTO.getSearchTerm())
+                        .analyzer("standard"));
+            } else if ("tags".equals(field)) {
+                boolQuery.must(QueryBuilders.matchQuery("tags.tagName.keyword", searchRequestDTO.getSearchTerm())
+                        .analyzer("standard"));
             } else {
-                boolQuery.should(QueryBuilders.matchQuery(field, searchRequestDTO.getSearchTerm()));
+                boolQuery.should(QueryBuilders.matchQuery(field, searchRequestDTO.getSearchTerm())
+                        .analyzer("standard"));
             }
         }
 
@@ -39,7 +40,7 @@ public final class SearchUtil {
         } else {
             sourceBuilder.sort("id.keyword", SortOrder.ASC);
         }
-
+        System.out.println(boolQuery);
         sourceBuilder.query(boolQuery);
         sourceBuilder.from(searchRequestDTO.getPage() * searchRequestDTO.getSize());
         sourceBuilder.size(searchRequestDTO.getSize());

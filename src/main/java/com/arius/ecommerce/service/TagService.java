@@ -1,5 +1,6 @@
 package com.arius.ecommerce.service;
 
+import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface TagService {
     List<TagDTO> getAllTags();
 
     List<TagDTO> getTagsByProductId(Long productId);
+
+    ProductDTO addTagToProduct(Long productId, TagDTO tagDTO);
 }

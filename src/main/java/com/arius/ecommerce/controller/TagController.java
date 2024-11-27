@@ -22,6 +22,11 @@ public class TagController {
         return ResponseEntity.ok(tagService.addTag(tagDTO));
     }
 
+    @PostMapping("/admin/tag/product/{productId}")
+    public ResponseEntity<?> addTagToProduct(@PathVariable Long productId, @RequestBody TagDTO tagDTO){
+        return ResponseEntity.ok(tagService.addTagToProduct(productId, tagDTO));
+    }
+
     @GetMapping("/public/tag")
     public ResponseEntity<?> getAllTags(){
         return ResponseEntity.ok(tagService.getAllTags());

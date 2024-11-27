@@ -186,7 +186,7 @@ public class ProductServiceImpl implements ProductService {
 
             return products;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error occurred while searching for products: " + e.getMessage());
             return Collections.emptyList();
         }
     }
