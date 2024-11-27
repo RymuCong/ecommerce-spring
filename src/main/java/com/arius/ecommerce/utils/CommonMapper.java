@@ -3,6 +3,7 @@ package com.arius.ecommerce.utils;
 import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
+import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

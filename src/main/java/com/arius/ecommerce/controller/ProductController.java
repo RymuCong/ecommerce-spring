@@ -3,6 +3,7 @@ package com.arius.ecommerce.controller;
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
 import jakarta.validation.Valid;
@@ -66,5 +67,18 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
         String message = productService.deleteProduct(productId);
         return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/admin/product/loadData")
+    public ResponseEntity<?> indexData() {
+        productService.reloadElasticsearchData();
+        return new ResponseEntity<>("Reload data successfully",HttpStatus.OK);
+    }
+
+    @GetMapping("/public/product/search")
+    public ResponseEntity<?> searchProducts(
+            @RequestBody final SearchRequestDTO searchRequestDTO
+    ){
+        return new ResponseEntity<>(productService.search(searchRequestDTO), HttpStatus.OK);
     }
 }

@@ -2,8 +2,12 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.elasticsearch.ProductDocument;
+import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface ProductService {
 
@@ -19,7 +23,9 @@ public interface ProductService {
 
     ProductResponse getProductsByCategory(Long categoryId, int page, int size);
 
-    ProductResponse searchByKeyword(String keyword, int page, int size);
-
     Product getProductById(Long productId);
+
+    List<ProductDocument> search(SearchRequestDTO searchRequestDTO);
+
+    void reloadElasticsearchData();
 }
