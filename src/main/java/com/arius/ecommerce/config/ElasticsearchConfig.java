@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticsearchConfig {
 
+    // new version but not use
     @Bean
     public ElasticsearchClient elasticsearchClient() {
         RestClient restClient = RestClient.builder(
@@ -25,6 +26,7 @@ public class ElasticsearchConfig {
         return new ElasticsearchClient(transport);
     }
 
+    // old version but still use
     @Bean
     public RestHighLevelClient restHighLevelClient() {
         return new RestHighLevelClient(

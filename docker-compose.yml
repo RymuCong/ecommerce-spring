@@ -6,3 +6,8 @@ services:
       - "9300:9300" #tcp
     environment:
       - discovery.type=single-node
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always

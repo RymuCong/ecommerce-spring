@@ -21,6 +21,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -158,6 +159,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "searchResults", key = "#searchRequestDTO.searchTerm")
     public List<ProductDocument> search(SearchRequestDTO searchRequestDTO) {
         SearchRequest requestDTO = SearchUtil.buildSearchRequest("product", searchRequestDTO);
         return searchInternal(requestDTO);

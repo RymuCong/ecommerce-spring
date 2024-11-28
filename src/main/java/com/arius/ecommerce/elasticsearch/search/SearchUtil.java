@@ -4,7 +4,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.apache.lucene.search.join.ScoreMode;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
