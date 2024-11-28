@@ -23,7 +23,7 @@ public final class SearchUtil {
                 boolQuery.should(QueryBuilders.matchQuery("category.categoryName", searchRequestDTO.getSearchTerm())
                         .analyzer("standard"));
             } else if ("tags".equals(field)) {
-                boolQuery.must(QueryBuilders.matchQuery("tags.tagName.keyword", searchRequestDTO.getSearchTerm())
+                boolQuery.must(QueryBuilders.matchQuery("tags.tagName", searchRequestDTO.getSearchTerm())
                         .analyzer("standard"));
             } else {
                 boolQuery.should(QueryBuilders.matchQuery(field, searchRequestDTO.getSearchTerm())

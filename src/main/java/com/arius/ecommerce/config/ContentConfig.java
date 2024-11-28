@@ -16,7 +16,6 @@ public class ContentConfig implements WebMvcConfigurer {
                 .mediaType("json", MediaType.APPLICATION_JSON).mediaType("xml", MediaType.APPLICATION_XML);
     }
 
-
 //    @Bean
 //    public WebMvcConfigurer corsConfigurer() {
 //        return new WebMvcConfigurer() {
