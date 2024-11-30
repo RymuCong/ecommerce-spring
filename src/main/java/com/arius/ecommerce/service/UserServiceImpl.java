@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         String token = null;
 
         if(auth.isAuthenticated()){
-            token = jwtUtils.generateToken(loginRequest.getEmail());
+            token = jwtUtils.generateToken(loginRequest.getEmail(), user.getRoles());
         }
 
         return new AuthResponse(token, "User logged in successfully");
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(role);
 
         userRepository.save(user);
-        return new AuthResponse(jwtUtils.generateToken(user.getEmail()), "User registered successfully");
+        return new AuthResponse(jwtUtils.generateToken(user.getEmail(), user.getRoles()), "User registered successfully");
     }
 
     @Override

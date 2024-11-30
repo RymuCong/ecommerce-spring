@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,6 +19,8 @@ public class ProductDTO {
     private Long price;
     private Double discount;
     private Long specialPrice;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private CategoryDTO category;
     private List<TagDTO> tags;
 }

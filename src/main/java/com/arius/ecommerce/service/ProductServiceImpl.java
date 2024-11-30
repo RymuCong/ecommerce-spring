@@ -70,6 +70,15 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         product.setImage(productImageUrl);
 
+        if (product.getDiscount() == 0) {
+            product.setSpecialPrice(product.getPrice());
+        } else if (product.getDiscount() >= 100) {
+            product.setSpecialPrice(0L);
+        } else {
+            double specialPrice = product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice());
+            product.setSpecialPrice(Math.round(specialPrice));
+        }
+
         productRepository.save(product);
         ProductDocument productDocument = ElasticsearchMapper.toProductDocument(product);
         elasticsearchIndexService.save(productDocument);

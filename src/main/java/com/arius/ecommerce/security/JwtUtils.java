@@ -1,6 +1,7 @@
 package com.arius.ecommerce.security;
 
 import com.arius.ecommerce.config.AppConstants;
+import com.arius.ecommerce.entity.Role;
 import com.arius.ecommerce.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,9 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtUtils {
@@ -47,8 +51,11 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String name){
+    public String generateToken(String name, Set<Role> authorities){
         Map<String,Object> claims = new HashMap<>();
+        claims.put("roles", authorities.stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toList()));
 
         return Jwts.builder()
                 .claims(claims)

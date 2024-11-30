@@ -45,7 +45,18 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @PutMapping("/admin/product/{productId}")
+    @GetMapping("/public/admin/product")
+    public ResponseEntity<ProductResponse> getAllProductsForAdmin(
+            @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
+            @RequestParam(name = "pageSize",defaultValue = "100",required = false) int pageSize,
+            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
+            @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
+    ){
+        ProductResponse productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy,sortDir);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/product/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
         ProductDTO productDTO = productService.updateProduct(productId,product);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);
