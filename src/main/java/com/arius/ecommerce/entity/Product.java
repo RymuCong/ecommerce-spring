@@ -38,7 +38,7 @@ public class Product {
     private String image;
 
     @NotBlank
-    @Size(min = 6, message = "Product name should have at least 6 characters")
+    @Size(min = 6, message = "Product description should have at least 6 characters")
     @Column(columnDefinition = "TEXT")
     private String description;
 

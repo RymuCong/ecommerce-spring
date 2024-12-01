@@ -11,12 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductResponse {
-
-    private List<ProductDTO> content;
+    private List<ProductDTO> products;
     private int pageNumber;
     private int pageSize;
     private long totalElements;
     private int totalPages;
     private boolean lastPage;
-
 }

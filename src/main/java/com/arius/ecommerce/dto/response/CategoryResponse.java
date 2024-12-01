@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryResponse {
 
-    private List<CategoryDTO> content;
+    private List<CategoryDTO> categories;
     private int pageNumber;
     private int pageSize;
     private long totalElements;

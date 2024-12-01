@@ -24,12 +24,10 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping(value = "/admin/product/add",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping("/public/product/add")
     public ResponseEntity<Product> addProduct(@RequestPart("categoryId") String categoryId,
                                               @RequestPart("product") ProductDTO productDTO,
-                                              @RequestPart(name = "image",required = false) MultipartFile image) {
+                                              @RequestPart(name = "image", required = false) MultipartFile image) {
         Product product = productService.addProduct(Long.parseLong(categoryId), productDTO, image);
         return ResponseEntity.ok(product);
     }
@@ -45,18 +43,25 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/public/admin/product")
-    public ResponseEntity<ProductResponse> getAllProductsForAdmin(
-            @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
-            @RequestParam(name = "pageSize",defaultValue = "100",required = false) int pageSize,
-            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
-            @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
-    ){
-        ProductResponse productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy,sortDir);
+    @GetMapping("/public/latest-products")
+    public ResponseEntity<ProductResponse> getLatestProducts(){
+        ProductResponse productResponse = productService.getLatestProducts();
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/product/{productId}")
+    @GetMapping("/public/product/category/{categoryId}")
+    public ResponseEntity<ProductResponse> getProductsByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
+            @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
+            @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
+            @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
+    ){
+        ProductResponse productResponse = productService.getProductsByCategory(categoryId,pageNumber,pageSize, sortBy, sortDir);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+    @PatchMapping("/admin/product/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
         ProductDTO productDTO = productService.updateProduct(productId,product);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);

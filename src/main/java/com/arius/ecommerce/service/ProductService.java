@@ -15,17 +15,21 @@ public interface ProductService {
 
     ProductResponse getAllProducts(int page, int size, String sortBy, String sortDir);
 
+    ProductResponse getAllProducts();
+
     ProductDTO updateProduct(Long productId, Product product);
 
     ProductDTO updateProductImage(Long productId, MultipartFile image);
 
     String deleteProduct(Long productId);
 
-    ProductResponse getProductsByCategory(Long categoryId, int page, int size);
+    ProductResponse getProductsByCategory(Long categoryId, int page, int size, String sortBy, String sortDir);
 
     Product getProductById(Long productId);
 
     List<ProductDocument> search(SearchRequestDTO searchRequestDTO);
 
     void reloadElasticsearchData();
+
+    ProductResponse getLatestProducts();
 }

@@ -100,13 +100,28 @@ public class ProductServiceImpl implements ProductService {
         }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setContent(productDTOs);
+        productResponse.setProducts(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
         productResponse.setTotalPages(pagedProducts.getTotalPages());
         productResponse.setLastPage(pagedProducts.isLast());
+        return productResponse;
+    }
 
+    @Override
+    public ProductResponse getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        List<ProductDTO> productDTOs = products.stream().map(product -> {
+            ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
+            if (product.getCategory() != null) {
+                productDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+            }
+            return productDTO;
+        }).toList();
+
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setProducts(productDTOs);
         return productResponse;
     }
 
@@ -157,8 +172,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProductsByCategory(Long categoryId, int page, int size) {
-        return null;
+    public ProductResponse getProductsByCategory(Long categoryId, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Product> pagedProducts = productRepository.findByCategoryCategoryId(categoryId, pageable);
+        List<Product> products = pagedProducts.getContent();
+        List<ProductDTO> productDTOs = products.stream().map(product -> {
+            ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
+            if (product.getCategory() != null) {
+                productDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+            }
+            return productDTO;
+        }).toList();
+
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setProducts(productDTOs);
+        productResponse.setPageNumber(pagedProducts.getNumber());
+        productResponse.setPageSize(pagedProducts.getSize());
+        productResponse.setTotalElements(pagedProducts.getTotalElements());
+        productResponse.setTotalPages(pagedProducts.getTotalPages());
+        productResponse.setLastPage(pagedProducts.isLast());
+        return productResponse;
     }
 
     @Override
@@ -178,6 +212,30 @@ public class ProductServiceImpl implements ProductService {
     public void reloadElasticsearchData() {
         elasticsearchIndexService.deleteIndex();
         elasticsearchIndexService.pushDataToElasticsearch();
+    }
+
+    @Override
+    public ProductResponse getLatestProducts() {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageDetails = PageRequest.of(0, 9, sort);
+        Page<Product> pagedProducts = productRepository.findAll(pageDetails);
+        List<Product> products = pagedProducts.getContent();
+        List<ProductDTO> productDTOs = products.stream().map(product -> {
+            ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
+            if (product.getCategory() != null) {
+                productDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+            }
+            return productDTO;
+        }).toList();
+
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setProducts(productDTOs);
+        productResponse.setPageNumber(pagedProducts.getNumber());
+        productResponse.setPageSize(pagedProducts.getSize());
+        productResponse.setTotalElements(pagedProducts.getTotalElements());
+        productResponse.setTotalPages(pagedProducts.getTotalPages());
+        productResponse.setLastPage(pagedProducts.isLast());
+        return productResponse;
     }
 
     private List<ProductDocument> searchInternal(final SearchRequest request) {
