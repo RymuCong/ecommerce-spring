@@ -21,6 +21,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -168,16 +169,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String deleteProduct(Long productId) {
+    public ProductDTO deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        // Initialize the lazy-loaded collection
+        Hibernate.initialize(product.getTags());
 
         List<Cart> cart = cartRepository.findCartsByProductId(productId);
         cart.forEach(cart1 -> cartService.deleteProductFromCartUsingCartId(cart1.getCartId(), productId));
 
-        s3Service.deleteProductImage(product.getImage());
+        if (product.getImage() != null && !product.getImage().isEmpty())
+            s3Service.deleteProductImage(product.getImage());
+
         productRepository.delete(product);
-        return "Product Deleted Successfully";
+        return CommonMapper.INSTANCE.toProductDTO(product);
     }
 
     @Override

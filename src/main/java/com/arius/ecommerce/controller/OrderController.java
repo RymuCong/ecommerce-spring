@@ -29,8 +29,8 @@ public class OrderController {
         this.jwtUtils = jwtUtils;
     }
 
-    @PostMapping("/user/cart/payment/{paymentMethodId}/order")
-    public ResponseEntity<OrderDTO> orderProducts(HttpServletRequest request, @PathVariable("paymentMethodId") Long paymentMethodId){
+    @PostMapping("/user/cart/order/payment/{paymentMethodId}")
+    public ResponseEntity<OrderDTO> orderProductsPaymentType(HttpServletRequest request, @PathVariable("paymentMethodId") Long paymentMethodId){
 
         String token = jwtUtils.extractToken(request);
         String emailId = jwtUtils.extractUserName(token);
@@ -38,7 +38,17 @@ public class OrderController {
         OrderDTO orderDTO = orderService.orderProducts(emailId, paymentMethodId);
 
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+    }
 
+    @PostMapping("/user/cart/order")
+    public ResponseEntity<OrderDTO> orderProducts(HttpServletRequest request){
+
+        String token = jwtUtils.extractToken(request);
+        String emailId = jwtUtils.extractUserName(token);
+        // COD
+        OrderDTO orderDTO = orderService.orderProducts(emailId, 2L);
+
+        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/admin/orders")
@@ -53,6 +63,14 @@ public class OrderController {
 
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
 
+    }
+
+    @GetMapping("/admin/orders/{orderId}")
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable("orderId") Long orderId){
+
+        OrderDTO orderDTO = orderService.getOrderById(orderId);
+
+        return new ResponseEntity<>(orderDTO,HttpStatus.OK);
     }
 
     @GetMapping("/user/orders")
@@ -78,8 +96,9 @@ public class OrderController {
         return new ResponseEntity<>(orderDTO,HttpStatus.OK);
     }
 
-    @PutMapping("/admin/orders/{orderId}/orderStatus/{orderStatus}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable("orderId") Long orderId, @PathVariable("orderStatus") OrderStatus orderStatus) {
+    @PatchMapping("/admin/orders/{orderId}")
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable("orderId") Long orderId, @RequestPart("status") String status){
+        OrderStatus orderStatus = OrderStatus.valueOf(status);
         OrderDTO orderDTO = orderService.updateOrder(orderId, orderStatus);
 
         return new ResponseEntity<>(orderDTO, HttpStatus.OK);

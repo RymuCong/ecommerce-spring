@@ -86,9 +86,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/admin/product/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
-        String message = productService.deleteProduct(productId);
-        return ResponseEntity.ok(message);
+    public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
+        ProductDTO deleteProduct = productService.deleteProduct(productId);
+        return ResponseEntity.ok(deleteProduct);
     }
 
     @PostMapping("/admin/product/loadData")

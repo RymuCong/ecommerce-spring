@@ -17,4 +17,6 @@ public interface OrderService {
     OrderDTO getOrderByUser(String emailId, Long orderId);
 
     OrderDTO updateOrder(Long orderId, OrderStatus orderStatus);
+
+    OrderDTO getOrderById(Long orderId);
 }

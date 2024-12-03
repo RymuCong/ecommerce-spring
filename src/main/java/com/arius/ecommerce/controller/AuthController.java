@@ -52,10 +52,21 @@ public class AuthController {
     }
 
     @GetMapping("/admin/is-login")
-    public ResponseEntity<?> getIsLogin() {
+    public ResponseEntity<?> getAdminIsLogin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ADMIN"))) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access Denied"));
+        }
+    }
+
+    @GetMapping("/user/is-login")
+    public ResponseEntity<?> getUserIsLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("USER"))) {
             return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access Denied"));

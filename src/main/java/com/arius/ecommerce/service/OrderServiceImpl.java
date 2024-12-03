@@ -194,4 +194,15 @@ public class OrderServiceImpl implements OrderService {
 
         return CommonMapper.INSTANCE.toOrderDTO(order);
     }
+
+    @Override
+    public OrderDTO getOrderById(Long orderId) {
+        Order order = orderRepository.findByOrderId(orderId);
+
+        if (order == null){
+            throw new ResourceNotFoundException("Order","orderId",orderId);
+        }
+
+        return CommonMapper.INSTANCE.toOrderDTO(order);
+    }
 }

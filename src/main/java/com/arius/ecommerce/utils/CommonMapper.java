@@ -43,4 +43,6 @@ public interface CommonMapper {
     Tag toTag(TagDTO tagDTO);
 
     TagDTO toTagDTO(Tag tag);
+
+    CartItemDTO toCartItemDTO(CartItem cartItem);
 }

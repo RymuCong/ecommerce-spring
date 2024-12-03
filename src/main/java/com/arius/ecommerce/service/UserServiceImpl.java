@@ -176,8 +176,9 @@ public class UserServiceImpl implements UserService {
 
         CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(user.getCart());
 
-        List<ProductDTO> productDTOS = user.getCart().getCartItems().stream()
-                .map(item -> CommonMapper.INSTANCE.toProductDTO(item.getProduct())).toList();
+        List<CartItemDTO> cartItemDTOS = user.getCart().getCartItems().stream().map(
+                CommonMapper.INSTANCE::toCartItemDTO
+        ).toList();
 
         Set<RoleDTO> roleDTOS = user.getRoles().stream()
                 .map(CommonMapper.INSTANCE::toRoleDTO).collect(Collectors.toSet());
@@ -187,7 +188,7 @@ public class UserServiceImpl implements UserService {
         ).toList();
 
         userDTO.setCartDTO(cartDTO);
-        userDTO.getCartDTO().setProducts(productDTOS);
+        userDTO.getCartDTO().setCartItems(cartItemDTOS);
         userDTO.setRoles(roleDTOS);
         userDTO.setAddress(addressDTOS);
 

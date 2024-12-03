@@ -1,6 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.CartDTO;
+import com.arius.ecommerce.dto.CartItemDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.CartItem;
@@ -89,10 +90,11 @@ public class CartServiceImpl implements CartService{
 
         CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(cart);
 
-        List<ProductDTO> productDTOS = cart.getCartItems().stream()
-                .map(p -> CommonMapper.INSTANCE.toProductDTO(p.getProduct())).toList();
+        List<CartItemDTO> cartItemDTOS = cart.getCartItems().stream().map(
+                CommonMapper.INSTANCE::toCartItemDTO
+        ).toList();
 
-        cartDTO.setProducts(productDTOS);
+        cartDTO.setCartItems(cartItemDTOS);
         return cartDTO;
     }
 
@@ -107,11 +109,11 @@ public class CartServiceImpl implements CartService{
         List<CartDTO> cartDTOS = carts.stream().map(cart -> {
             CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(cart);
 
-            List<ProductDTO> productDTOS = cart.getCartItems().stream().map(
-                    prod -> CommonMapper.INSTANCE.toProductDTO(prod.getProduct())
+            List<CartItemDTO> cartItemDTOS = cart.getCartItems().stream().map(
+                    CommonMapper.INSTANCE::toCartItemDTO
             ).toList();
 
-            cartDTO.setProducts(productDTOS);
+            cartDTO.setCartItems(cartItemDTOS);
 
             return cartDTO;
         }).toList();
@@ -131,11 +133,11 @@ public class CartServiceImpl implements CartService{
 
         CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(cart);
 
-        List<ProductDTO> productDTOS = cart.getCartItems().stream().map(
-                prod->CommonMapper.INSTANCE.toProductDTO(prod.getProduct())
+        List<CartItemDTO> cartItemDTOS = cart.getCartItems().stream().map(
+                CommonMapper.INSTANCE::toCartItemDTO
         ).toList();
 
-        cartDTO.setProducts(productDTOS);
+        cartDTO.setCartItems(cartItemDTOS);
 
         return cartDTO;
     }
@@ -169,19 +171,17 @@ public class CartServiceImpl implements CartService{
             throw new APIException("Product " + product.getProductName() + " not available in the cart");
         }
 
-        int cartItemQuantity = cartItem.getQuantity() + quantity;
-
-        if (product.getQuantity() <= cartItemQuantity) {
+        if (product.getQuantity() <= quantity) {
             throw new APIException("You have reached your limit");
         }
 
         double cartPrice = cart.getTotalPrice() - (cartItem.getSpecialPrice() * cartItem.getQuantity());
 
         cartItem.setSpecialPrice(product.getSpecialPrice());
-        cartItem.setQuantity(cartItemQuantity);
+        cartItem.setQuantity(quantity);
         cartItem.setDiscount(product.getDiscount());
 
-        cart.setTotalPrice((long) (cartPrice + (cartItem.getSpecialPrice() * cartItemQuantity)));
+        cart.setTotalPrice((long) (cartPrice + (cartItem.getSpecialPrice() * quantity)));
         cartItemRepository.save(cartItem);
 
 //        product.setQuantity(product.getQuantity() - quantity);
@@ -190,17 +190,17 @@ public class CartServiceImpl implements CartService{
 
         CartDTO cartDTO = CommonMapper.INSTANCE.toCartDTO(cart);
 
-        List<ProductDTO> productDTOS = cart.getCartItems().stream().map(
-                prod -> CommonMapper.INSTANCE.toProductDTO(prod.getProduct())
+        List<CartItemDTO> cartItemDTOS = cart.getCartItems().stream().map(
+                CommonMapper.INSTANCE::toCartItemDTO
         ).toList();
 
-        cartDTO.setProducts(productDTOS);
+        cartDTO.setCartItems(cartItemDTOS);
 
         return cartDTO;
     }
 
     @Override
-    public String deleteProductFromCart(String emailId, Long productId) {
+    public CartDTO deleteProductFromCart(String emailId, Long productId) {
         User user = userRepository.findByEmail(emailId);
 
         if (user == null){
@@ -213,11 +213,11 @@ public class CartServiceImpl implements CartService{
 
         cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getSpecialPrice() * cartItem.getQuantity()));
 
-        Product product = cartItem.getProduct();
-        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+//        Product product = cartItem.getProduct();
+//        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
 
         cartItemRepository.deleteCartItemByProductIdAndCartId(cart.getCartId(),productId);
-        return "Product " + cartItem.getProduct().getProductName() + " deleted successfully";
+        return CommonMapper.INSTANCE.toCartDTO(cart);
     }
 
     @Override
@@ -229,7 +229,7 @@ public class CartServiceImpl implements CartService{
 
         cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getSpecialPrice() * cartItem.getQuantity()));
 
-        Product product = cartItem.getProduct();
+//        Product product = cartItem.getProduct();
 //        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
 
         cartItemRepository.deleteCartItemByProductIdAndCartId(cart.getCartId(),productId);

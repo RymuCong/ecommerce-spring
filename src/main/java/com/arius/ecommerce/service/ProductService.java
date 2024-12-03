@@ -22,7 +22,7 @@ public interface ProductService {
 
     ProductDTO updateProductImage(Long productId, MultipartFile image);
 
-    String deleteProduct(Long productId);
+    ProductDTO deleteProduct(Long productId);
 
     ProductResponse getProductsByCategory(Long categoryId, int page, int size, String sortBy, String sortDir);
 

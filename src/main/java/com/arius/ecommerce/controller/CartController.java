@@ -26,12 +26,11 @@ public class CartController {
         this.jwtUtils = jwtUtils;
     }
 
-    @PostMapping("/user/cart/products/{productId}/quantity/{quantity}")
-    public ResponseEntity<?> addProductToCart(HttpServletRequest request, @PathVariable Long productId, @PathVariable int quantity) {
+    @PostMapping("/user/cart/{productId}")
+    public ResponseEntity<?> addProductToCart(HttpServletRequest request, @PathVariable Long productId) {
         String token = jwtUtils.extractToken(request);
         String userEmail = jwtUtils.extractUserName(token);
-
-        CartDTO cartDTO = cartService.addProductToCart(userEmail,productId,quantity);
+        CartDTO cartDTO = cartService.addProductToCart(userEmail,productId,1);
 
         return new ResponseEntity<>(cartDTO, HttpStatus.OK);
     }
@@ -54,7 +53,7 @@ public class CartController {
     }
 
 
-    @PutMapping("/user/cart/products/{productId}/quantity/{quantity}")
+    @PatchMapping("/user/cart/product/{productId}/quantity/{quantity}")
     public ResponseEntity<CartDTO> updateCartProduct(HttpServletRequest request, @PathVariable("productId") Long productId, @PathVariable("quantity") int quantity){
 
         String token = jwtUtils.extractToken(request);
@@ -64,14 +63,14 @@ public class CartController {
         return new ResponseEntity<>(cartDTO,HttpStatus.OK);
     }
 
-    @DeleteMapping("/user/cart/products/{productId}")
-    public ResponseEntity<String> deleteProductFromCart(HttpServletRequest request,@PathVariable("productId") Long productId){
+    @DeleteMapping("/user/cart/product/{productId}")
+    public ResponseEntity<CartDTO> deleteProductFromCart(HttpServletRequest request,@PathVariable("productId") Long productId){
 
         String token = jwtUtils.extractToken(request);
         String emailId = jwtUtils.extractUserName(token);
 
-        String response = cartService.deleteProductFromCart(emailId,productId);
+        CartDTO cartDTO = cartService.deleteProductFromCart(emailId,productId);
 
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        return new ResponseEntity<>(cartDTO,HttpStatus.OK);
     }
 }

@@ -10,7 +10,9 @@ public interface CategoryService {
 
     CategoryResponse getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir);
 
+    CategoryDTO getCategoryById(Long categoryId);
+
     CategoryDTO updateCategory(Category category, Long categoryId);
 
-    String deleteCategory(Long categoryId);
+    CategoryDTO deleteCategory(Long categoryId);
 }
