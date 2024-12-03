@@ -53,7 +53,7 @@ public class Product {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "category_id")
-    @ToString.Exclude
+//    @ToString.Exclude
     private Category category;
 
     @OneToMany(mappedBy = "product",cascade = {CascadeType.PERSIST,CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
@@ -64,7 +64,7 @@ public class Product {
     @ToString.Exclude
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "product_tags",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))

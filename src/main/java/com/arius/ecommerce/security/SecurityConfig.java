@@ -40,11 +40,12 @@ public class SecurityConfig {
                         .requestMatchers(AppConstants.USER_URLS).hasAnyAuthority("USER","ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
-//                .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
-//                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,"BAD REQUEST");
-//                }))
+                .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,"BAD REQUEST");
+                }))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+            http.cors(Customizer.withDefaults());
             http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
             http.authenticationProvider(daoAuthenticationProvider());
         return http.build();

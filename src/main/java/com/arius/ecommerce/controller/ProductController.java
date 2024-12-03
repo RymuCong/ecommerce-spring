@@ -6,9 +6,8 @@ import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
-import jakarta.validation.Valid;
+import com.arius.ecommerce.utils.CommonMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,12 +23,14 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping("/public/product/add")
-    public ResponseEntity<Product> addProduct(@RequestPart("categoryId") String categoryId,
+    @PostMapping("/admin/product/add")
+    public ResponseEntity<ProductDTO> addProduct(@RequestPart("categoryId") String categoryId,
                                               @RequestPart("product") ProductDTO productDTO,
                                               @RequestPart(name = "image", required = false) MultipartFile image) {
         Product product = productService.addProduct(Long.parseLong(categoryId), productDTO, image);
-        return ResponseEntity.ok(product);
+        ProductDTO responseDTO = CommonMapper.INSTANCE.toProductDTO(product);
+        responseDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping("/public/product")
@@ -62,21 +63,26 @@ public class ProductController {
     }
 
     @PatchMapping("/admin/product/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody Product product, @PathVariable("productId") Long productId){
-        ProductDTO productDTO = productService.updateProduct(productId,product);
-        return new ResponseEntity<>(productDTO,HttpStatus.OK);
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable("productId") Long productId,
+            @RequestPart("product") ProductDTO productDTO,
+            @RequestPart(name = "image", required = false) MultipartFile image){
+        ProductDTO updateProduct = productService.updateProduct(productId, productDTO, image);
+        return new ResponseEntity<>(updateProduct,HttpStatus.OK);
     }
 
-    @PutMapping("/admin/product/{productId}/image")
+    @PatchMapping("/admin/product/{productId}/image")
     public ResponseEntity<ProductDTO> updateProductImage(@PathVariable("productId") Long productId, @RequestParam("image") MultipartFile image) {
         ProductDTO productDTO = productService.updateProductImage(productId,image);
         return new ResponseEntity<>(productDTO,HttpStatus.OK);
     }
 
     @GetMapping("/public/product/{productId}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long productId) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
         Product product = productService.getProductById(productId);
-        return ResponseEntity.ok(product);
+        ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
+        productDTO.setCategory(CommonMapper.INSTANCE.toCategoryDTO(product.getCategory()));
+        return ResponseEntity.ok(productDTO);
     }
 
     @DeleteMapping("/admin/product/{productId}")

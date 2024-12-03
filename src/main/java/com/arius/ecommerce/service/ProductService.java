@@ -5,6 +5,7 @@ import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
+import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface ProductService {
 
     ProductResponse getAllProducts();
 
-    ProductDTO updateProduct(Long productId, Product product);
+    ProductDTO updateProduct(Long productId, ProductDTO productDTO, MultipartFile image);
 
     ProductDTO updateProductImage(Long productId, MultipartFile image);
 
@@ -32,4 +33,5 @@ public interface ProductService {
     void reloadElasticsearchData();
 
     ProductResponse getLatestProducts();
+
 }

@@ -12,6 +12,7 @@ import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.CartRepository;
 import com.arius.ecommerce.repository.CategoryRepository;
 import com.arius.ecommerce.repository.ProductRepository;
+import com.arius.ecommerce.repository.TagRepository;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,18 +127,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO updateProduct(Long productId, Product product) {
+    public ProductDTO updateProduct(Long productId, ProductDTO productDto, MultipartFile image) {
         Product savedProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        product.setImage(savedProduct.getImage());
-        product.setProductId(productId);
-        product.setCategory(savedProduct.getCategory());
+        savedProduct.setProductName(productDto.getProductName());
+        savedProduct.setDescription(productDto.getDescription());
+        savedProduct.setQuantity(productDto.getQuantity());
+        savedProduct.setPrice(productDto.getPrice());
+        savedProduct.setDiscount(productDto.getDiscount());
 
-        double specialPrice = product.getPrice() - ((product.getDiscount() * 0.01) * product.getPrice());
-        product.setSpecialPrice(Math.round(specialPrice));
+        double specialPrice = productDto.getPrice() - ((productDto.getDiscount() * 0.01) * productDto.getPrice());
+        savedProduct.setSpecialPrice(Math.round(specialPrice));
 
-        Product finalProduct = productRepository.save(product);
+        if (image != null) {
+            String productImageUrl = s3Service.uploadProductFile(image);
+            s3Service.deleteProductImage(savedProduct.getImage());
+            savedProduct.setImage(productImageUrl);
+        }
+
+        Product finalProduct = productRepository.save(savedProduct);
         return CommonMapper.INSTANCE.toProductDTO(finalProduct);
     }
 
@@ -149,9 +158,9 @@ public class ProductServiceImpl implements ProductService {
         String productImageUrl = null;
         if (image != null) {
             productImageUrl = s3Service.uploadProductFile(image);
+            s3Service.deleteProductImage(product.getImage());
         }
 
-        s3Service.deleteProductImage(product.getImage());
         product.setImage(productImageUrl);
 
         Product updatedProduct = productRepository.save(product);
