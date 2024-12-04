@@ -30,6 +30,21 @@ public class ProductDocument implements Serializable {
     @Field(name = "name", type = FieldType.Text)
     private String productName;
 
+    @Field(name = "price", type = FieldType.Long)
+    private Long price;
+
+    @Field(name = "specialPrice", type = FieldType.Long)
+    private Long specialPrice;
+
+    @Field(name = "discount", type = FieldType.Double)
+    private Double discount;
+
+    @Field(name = "quantity", type = FieldType.Integer)
+    private Integer quantity;
+
+    @Field(name = "image", type = FieldType.Text)
+    private String image;
+
     @Field(name = "description", type = FieldType.Text)
     private String description;
 
@@ -43,12 +58,22 @@ public class ProductDocument implements Serializable {
     public ProductDocument(
             @JsonProperty("id") String productId,
             @JsonProperty("name") String productName,
+            @JsonProperty("price") Long price,
+            @JsonProperty("specialPrice") Long specialPrice,
+            @JsonProperty("discount") Double discount,
+            @JsonProperty("quantity") Integer quantity,
+            @JsonProperty("image") String image,
             @JsonProperty("description") String description,
             @JsonProperty("category") CategoryDTO category,
             @JsonProperty("tags") List<TagDTO> tags
     ) {
         this.productId = productId;
         this.productName = productName;
+        this.price = price;
+        this.specialPrice = specialPrice;
+        this.discount = discount;
+        this.quantity = quantity;
+        this.image = image;
         this.description = description;
         this.category = category;
         this.tags = tags;

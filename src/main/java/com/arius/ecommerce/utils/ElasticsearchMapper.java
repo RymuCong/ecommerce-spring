@@ -16,6 +16,11 @@ public class ElasticsearchMapper {
         ProductDocument productDocument = new ProductDocument();
         productDocument.setProductId(String.valueOf(product.getProductId()));
         productDocument.setProductName(product.getProductName());
+        productDocument.setPrice(product.getPrice());
+        productDocument.setSpecialPrice(product.getSpecialPrice());
+        productDocument.setDiscount(product.getDiscount());
+        productDocument.setQuantity(product.getQuantity());
+        productDocument.setImage(product.getImage());
         productDocument.setDescription(product.getDescription());
         productDocument.setCategory(CommonMapper.INSTANCE.toCategoryDTO( product.getCategory()));
         if (product.getTags() != null)

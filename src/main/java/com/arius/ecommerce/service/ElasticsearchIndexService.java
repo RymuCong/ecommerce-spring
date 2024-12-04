@@ -63,6 +63,11 @@ public class ElasticsearchIndexService {
         Document document = Document.create();
         document.put("id", eProduct.getProductId());
         document.put("name", eProduct.getProductName());
+        document.put("price", eProduct.getPrice());
+        document.put("specialPrice", eProduct.getSpecialPrice());
+        document.put("discount", eProduct.getDiscount());
+        document.put("quantity", eProduct.getQuantity());
+        document.put("image", eProduct.getImage());
         document.put("category", eProduct.getCategory());
         document.put("tags", eProduct.getTags());
         document.put("description", eProduct.getDescription());
