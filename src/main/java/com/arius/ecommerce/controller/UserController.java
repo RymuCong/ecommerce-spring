@@ -81,7 +81,6 @@ public class UserController {
         if (authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("USER"))) {
             UserDTO user = userService.getUser(request);
-//            LoginResponse response = new LoginResponse("Logged In", user);
             return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
