@@ -1,10 +1,13 @@
 package com.arius.ecommerce.controller;
 
+import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.response.AuthResponse;
+import com.arius.ecommerce.dto.response.LoginResponse;
 import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.service.UserService;
+import com.arius.ecommerce.utils.CommonMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,28 +51,6 @@ public class AuthController {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/admin/is-login")
-    public ResponseEntity<?> getAdminIsLogin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ADMIN"))) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access Denied"));
-        }
-    }
-
-    @GetMapping("/user/is-login")
-    public ResponseEntity<?> getUserIsLogin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("USER"))) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access Denied"));
         }
     }
 }

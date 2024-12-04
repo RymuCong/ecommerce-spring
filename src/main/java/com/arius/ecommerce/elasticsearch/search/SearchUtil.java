@@ -32,14 +32,14 @@ public final class SearchUtil {
 
         if (searchRequestDTO.getSortBy() != null) {
             String sortBy = searchRequestDTO.getSortBy();
-            if ("id".equals(sortBy)) {
-                sortBy = "id.keyword";
+            if ("name".equals(sortBy) || "tags".equals(sortBy)) {
+                sortBy = sortBy + ".keyword";
             }
             sourceBuilder.sort(sortBy, searchRequestDTO.getOrder() != null ? searchRequestDTO.getOrder() : SortOrder.ASC);
         } else {
             sourceBuilder.sort("id.keyword", SortOrder.ASC);
         }
-        System.out.println(boolQuery);
+
         sourceBuilder.query(boolQuery);
         sourceBuilder.from(searchRequestDTO.getPage() * searchRequestDTO.getSize());
         sourceBuilder.size(searchRequestDTO.getSize());

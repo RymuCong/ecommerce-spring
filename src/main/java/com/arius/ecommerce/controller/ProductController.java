@@ -97,7 +97,7 @@ public class ProductController {
         return new ResponseEntity<>("Reload data successfully",HttpStatus.OK);
     }
 
-    @GetMapping("/public/product/search")
+    @PostMapping("/public/product/search")
     public ResponseEntity<?> searchProducts(
             @RequestBody final SearchRequestDTO searchRequestDTO
     ){
