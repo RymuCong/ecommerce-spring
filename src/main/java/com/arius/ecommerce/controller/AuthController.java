@@ -37,7 +37,7 @@ public class AuthController {
     public ResponseEntity<?> loginAdmin(@RequestBody LoginRequest loginRequest) {
         try {
             System.err.println("Admin login request: " + loginRequest);
-            AuthResponse user = userService.loginUser(loginRequest);
+            AuthResponse user = userService.loginAdmin(loginRequest);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());

@@ -21,4 +21,10 @@ public interface UserService {
     UserDTO updateUser(UserDTO dto, HttpServletRequest request);
 
     String deleteUser(Long userId);
+
+    AuthResponse loginAdmin(LoginRequest loginRequest);
+
+    AuthResponse registerAdmin(RegisterRequest registerRequest);
+
+    UserDTO getUserById(Long userId);
 }

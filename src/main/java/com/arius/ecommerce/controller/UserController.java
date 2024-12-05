@@ -65,13 +65,14 @@ public class UserController {
     }
 
     @GetMapping("/admin/is-login")
-    public ResponseEntity<?> getAdminIsLogin() {
+    public ResponseEntity<?> getAdminIsLogin(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ADMIN"))) {
-            return ResponseEntity.ok(Collections.singletonMap("message", "Logged In"));
+            UserDTO user = userService.getUser(request);
+            return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Access Denied"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new LoginResponse("Access Denied", null));
         }
     }
 
@@ -86,5 +87,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new LoginResponse("Access Denied", null));
         }
+    }
+
+    @GetMapping("/admin/users/{userId}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Long userId){
+        UserDTO userDTO = userService.getUserById(userId);
+        return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 }

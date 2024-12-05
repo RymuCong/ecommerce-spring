@@ -218,9 +218,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Cacheable(value = "searchResults", key = "#searchRequestDTO.searchTerm")
-    public List<ProductDocument> search(SearchRequestDTO searchRequestDTO) {
+    public List<ProductDTO> search(SearchRequestDTO searchRequestDTO) {
         SearchRequest requestDTO = SearchUtil.buildSearchRequest("product", searchRequestDTO);
-        return searchInternal(requestDTO);
+        List<ProductDocument> productDocumentList = searchInternal(requestDTO);
+        return productDocumentList.stream()
+                .map(CommonMapper.INSTANCE::toProductDTO)
+                .toList();
     }
 
     @Override

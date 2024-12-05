@@ -57,14 +57,20 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundUserException("User not found");
         }
 
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getRoleName().equals(AppConstants.ROLE_ADMIN));
+        if (isAdmin) {
+            throw new APIException("Admin users cannot log in using this method");
+        }
+
         UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
         Authentication auth = authenticationManager.authenticate(authToken);
 
         String token = null;
 
-        if(auth.isAuthenticated()){
+        if (auth.isAuthenticated()) {
             token = jwtUtils.generateToken(loginRequest.getEmail(), user.getRoles());
         }
 
@@ -169,6 +175,60 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
         return  "User Deleted Successfully";
+    }
+
+    @Override
+    public AuthResponse loginAdmin(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+        if (user == null) {
+            throw new NotFoundUserException("User not found");
+        }
+
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getRoleName().equals(AppConstants.ROLE_ADMIN));
+        if (!isAdmin) {
+            throw new APIException("User does not have admin privileges");
+        }
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+
+        Authentication auth = authenticationManager.authenticate(authToken);
+
+        String token = null;
+
+        if (auth.isAuthenticated()) {
+            token = jwtUtils.generateToken(loginRequest.getEmail(), user.getRoles());
+        }
+
+        return new AuthResponse(token, "Admin logged in successfully");
+    }
+
+    @Override
+    public AuthResponse registerAdmin(RegisterRequest registerRequest) {
+        User existingUser = userRepository.findByEmail(registerRequest.getEmail());
+        if (existingUser != null) {
+            return new AuthResponse(null, "User already exists with email " + registerRequest.getEmail());
+        }
+
+        User user = CommonMapper.INSTANCE.toUser(registerRequest);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        user.setPassword(encoder.encode(registerRequest.getPassword()));
+
+        Role role = roleRepository.findByRoleName(AppConstants.ROLE_ADMIN);
+        user.getRoles().add(role);
+
+        userRepository.save(user);
+        return new AuthResponse(jwtUtils.generateToken(user.getEmail(), user.getRoles()), "Admin registered successfully");
+    }
+
+    @Override
+    public UserDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User","userId",userId));
+
+        return getUserDTO(user);
     }
 
     private static UserDTO getUserDTO(User user) {

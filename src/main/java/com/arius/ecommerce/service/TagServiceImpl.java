@@ -2,6 +2,7 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
+import com.arius.ecommerce.dto.response.TagResponse;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.entity.Tag;
 import com.arius.ecommerce.exception.APIException;
@@ -9,6 +10,10 @@ import com.arius.ecommerce.repository.ProductRepository;
 import com.arius.ecommerce.repository.TagRepository;
 import com.arius.ecommerce.utils.CommonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,17 +59,33 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public void deleteTag(Long tagId) {
+    public TagDTO deleteTag(Long tagId) {
         Tag tag = tagRepository.findTagByTagId(tagId);
         if (tag == null){
             throw new APIException("Tag not found " + tagId);
         }
         tagRepository.delete(tag);
+        return CommonMapper.INSTANCE.toTagDTO(tag);
     }
 
     @Override
-    public List<TagDTO> getAllTags() {
-        return tagRepository.findAll().stream().map(CommonMapper.INSTANCE::toTagDTO).toList();
+    public TagResponse getAllTags(int page, int size, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(page, size, sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
+        Page<Tag> tagsPage = tagRepository.findAll(pageable);
+
+        List<TagDTO> tagDTOs = tagsPage.getContent().stream()
+                .map(CommonMapper.INSTANCE::toTagDTO)
+                .toList();
+
+        TagResponse tagResponse = new TagResponse();
+        tagResponse.setTags(tagDTOs);
+        tagResponse.setPageNumber(tagsPage.getNumber());
+        tagResponse.setPageSize(tagsPage.getSize());
+        tagResponse.setTotalElements(tagsPage.getTotalElements());
+        tagResponse.setTotalPages(tagsPage.getTotalPages());
+        tagResponse.setLastPage(tagsPage.isLast());
+
+        return tagResponse;
     }
 
     @Override

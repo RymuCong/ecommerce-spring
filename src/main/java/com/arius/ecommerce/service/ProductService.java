@@ -28,7 +28,7 @@ public interface ProductService {
 
     Product getProductById(Long productId);
 
-    List<ProductDocument> search(SearchRequestDTO searchRequestDTO);
+    List<ProductDTO> search(SearchRequestDTO searchRequestDTO);
 
     void reloadElasticsearchData();
 

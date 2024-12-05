@@ -29,8 +29,13 @@ public class TagController {
     }
 
     @GetMapping("/public/tag")
-    public ResponseEntity<?> getAllTags(){
-        return ResponseEntity.ok(tagService.getAllTags());
+    public ResponseEntity<?> getAllTags(
+            @RequestParam(name = "pageNumber",defaultValue = "0",required = false) int pageNumber,
+            @RequestParam(name = "pageSize",defaultValue = "10",required = false) int pageSize,
+            @RequestParam(name = "sortBy",defaultValue = "tagId",required = false) String sortBy,
+            @RequestParam(name = "sortDir",defaultValue = "asc",required = false) String sortDir
+    ){
+        return ResponseEntity.ok(tagService.getAllTags(pageNumber, pageSize, sortBy, sortDir));
     }
 
     @GetMapping("/public/tag/{tagId}")
@@ -38,15 +43,14 @@ public class TagController {
         return ResponseEntity.ok(tagService.getTagById(tagId));
     }
 
-    @PutMapping("/admin/tag/{tagId}")
+    @PatchMapping("/admin/tag/{tagId}")
     public ResponseEntity<?> updateTag(@PathVariable Long tagId, @RequestBody TagDTO tagDTO){
         return ResponseEntity.ok(tagService.updateTag(tagId, tagDTO));
     }
 
     @DeleteMapping("/admin/tag/{tagId}")
     public ResponseEntity<?> deleteTag(@PathVariable Long tagId){
-        tagService.deleteTag(tagId);
-        return ResponseEntity.ok("Tag deleted successfully");
+        return ResponseEntity.ok(tagService.deleteTag(tagId));
     }
 
     @GetMapping("/public/tag/product/{productId}")

@@ -2,6 +2,7 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
+import com.arius.ecommerce.dto.response.TagResponse;
 
 import java.util.List;
 
@@ -12,9 +13,9 @@ public interface TagService {
 
     TagDTO updateTag(Long tagId, TagDTO tagDTO);
 
-    void deleteTag(Long tagId);
+    TagDTO deleteTag(Long tagId);
 
-    List<TagDTO> getAllTags();
+    TagResponse getAllTags(int page, int size, String sortBy, String sortDir);
 
     List<TagDTO> getTagsByProductId(Long productId);
 
