@@ -41,7 +41,7 @@ public final class SearchUtil {
         }
 
         sourceBuilder.query(boolQuery);
-        sourceBuilder.from(searchRequestDTO.getPage() * searchRequestDTO.getSize());
+        sourceBuilder.from(searchRequestDTO.getPageNumber() * searchRequestDTO.getSize());
         sourceBuilder.size(searchRequestDTO.getSize());
 
         SearchRequest searchRequest = new SearchRequest(index);

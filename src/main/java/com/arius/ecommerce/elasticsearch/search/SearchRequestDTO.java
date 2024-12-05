@@ -1,15 +1,13 @@
 package com.arius.ecommerce.elasticsearch.search;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.List;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchRequestDTO extends PagedRequestDTO {
@@ -17,4 +15,7 @@ public class SearchRequestDTO extends PagedRequestDTO {
     private String searchTerm;
     private String sortBy;
     private SortOrder order;
+    private long totalElements;
+    private int totalPages;
+    private boolean lastPage;
 }

@@ -1,6 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.*;
+import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
@@ -97,6 +98,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO registerUserForAdmin(RegisterForAdminRequest registerForAdminRequest) {
+        User existingUser = userRepository.findByEmail(registerForAdminRequest.getEmail());
+        if (existingUser != null) {
+            throw new APIException("User already exists with email " + registerForAdminRequest.getEmail());
+        }
+
+        User user = CommonMapper.INSTANCE.toUser(registerForAdminRequest);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        user.setPassword(encoder.encode(registerForAdminRequest.getPassword()));
+
+        Set<Role> roles = registerForAdminRequest.getRoles().stream()
+                .map(roleRepository::findByRoleName)
+                .collect(Collectors.toSet());
+        user.setRoles(roles);
+
+        userRepository.save(user);
+        cartService.createCart(user.getEmail());
+
+        return getReadUserDTO(user);
+    }
+
+    @Override
     public UserResponse getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -111,10 +135,10 @@ public class UserServiceImpl implements UserService {
             throw new APIException("No User exists");
         }
 
-        List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getUserDTO).toList();
+        List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
 
         UserResponse userResponse = new UserResponse();
-        userResponse.setContent(userDTOS);
+        userResponse.setUsers(userDTOS);
         userResponse.setPageNumber(pagedUser.getNumber());
         userResponse.setPageSize(pagedUser.getSize());
         userResponse.setTotalPages(pagedUser.getTotalPages());
@@ -159,22 +183,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String deleteUser(Long userId) {
+    public Long deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User","userId",userId));
 
-        List<CartItem> cartItems = user.getCart().getCartItems();
-        Long cartId = user.getCart().getCartId();
+        if (user.getCart() != null) {
+            List<CartItem> cartItems = user.getCart().getCartItems();
+            Long cartId = user.getCart().getCartId();
 
-        cartItems.forEach(cartItem -> {
-            Long productId = cartItem.getProduct().getProductId();
 
-            cartService.deleteProductFromCartUsingCartId(cartId,productId);
-        });
+            cartItems.forEach(cartItem -> {
+                Long productId = cartItem.getProduct().getProductId();
+
+                cartService.deleteProductFromCartUsingCartId(cartId, productId);
+            });
+        }
 
         userRepository.delete(user);
 
-        return  "User Deleted Successfully";
+        return userId;
     }
 
     @Override
@@ -249,6 +276,22 @@ public class UserServiceImpl implements UserService {
 
         userDTO.setCartDTO(cartDTO);
         userDTO.getCartDTO().setCartItems(cartItemDTOS);
+        userDTO.setRoles(roleDTOS);
+        userDTO.setAddress(addressDTOS);
+
+        return userDTO;
+    }
+
+    private static UserDTO getReadUserDTO(User user) {
+        UserDTO userDTO = CommonMapper.INSTANCE.toUserDTO(user);
+
+        Set<RoleDTO> roleDTOS = user.getRoles().stream()
+                .map(CommonMapper.INSTANCE::toRoleDTO).collect(Collectors.toSet());
+
+        List<AddressDTO> addressDTOS = user.getAddresses().stream().map(
+                CommonMapper.INSTANCE::toAddressDTO
+        ).toList();
+
         userDTO.setRoles(roleDTOS);
         userDTO.setAddress(addressDTOS);
 

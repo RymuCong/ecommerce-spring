@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface CartService {
 
+    CartDTO createCart(String email);
+
     CartDTO addProductToCart(String userEmail, Long productId, int quantity);
 
     List<CartDTO> getCarts();

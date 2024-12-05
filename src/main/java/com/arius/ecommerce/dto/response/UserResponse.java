@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserResponse {
 
-    private List<UserDTO> content;
+    private List<UserDTO> users;
     private int pageNumber;
     private int pageSize;
     private long totalElements;

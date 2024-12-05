@@ -13,10 +13,10 @@ public class PagedRequestDTO {
 
     private static final int DEFAULT_SIZE = 100;
 
-    private int page;
-    private int size;
+    private int pageNumber;
+    private int pageSize;
 
     public int getSize() {
-        return size != 0 ? size : DEFAULT_SIZE;
+        return pageSize != 0 ? pageSize : DEFAULT_SIZE;
     }
 }

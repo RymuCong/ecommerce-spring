@@ -1,6 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.UserDTO;
+import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
@@ -14,13 +15,15 @@ public interface UserService {
 
     AuthResponse registerUser(RegisterRequest registerRequest);
 
+    UserDTO registerUserForAdmin(RegisterForAdminRequest registerForAdminRequest);
+
     UserResponse getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     UserDTO getUser(HttpServletRequest request);
 
     UserDTO updateUser(UserDTO dto, HttpServletRequest request);
 
-    String deleteUser(Long userId);
+    Long deleteUser(Long userId);
 
     AuthResponse loginAdmin(LoginRequest loginRequest);
 

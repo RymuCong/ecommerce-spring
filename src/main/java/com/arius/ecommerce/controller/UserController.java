@@ -2,12 +2,13 @@ package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.UserDTO;
+import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.response.LoginResponse;
 import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.entity.Role;
 import com.arius.ecommerce.entity.User;
-import com.arius.ecommerce.security.UserPrincipal;
+import com.arius.ecommerce.service.RoleService;
 import com.arius.ecommerce.service.UserService;
-import com.arius.ecommerce.utils.CommonMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -25,9 +29,12 @@ public class UserController {
 
     private final UserService userService;
 
+    private final RoleService roleService;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping("/admin/users")
@@ -57,11 +64,8 @@ public class UserController {
     }
 
     @DeleteMapping("/admin/users/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId){
-
-        String deleteUser = userService.deleteUser(userId);
-
-        return new ResponseEntity<>(deleteUser,HttpStatus.OK);
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId){
+        return new ResponseEntity<>(userService.deleteUser(userId),HttpStatus.OK);
     }
 
     @GetMapping("/admin/is-login")
@@ -93,5 +97,11 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Long userId){
         UserDTO userDTO = userService.getUserById(userId);
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/users/register")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterForAdminRequest registerRequest) {
+        UserDTO registeredUser = userService.registerUserForAdmin(registerRequest);
+        return new ResponseEntity<>(registeredUser, HttpStatus.OK);
     }
 }

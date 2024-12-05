@@ -2,11 +2,17 @@ package com.arius.ecommerce.utils;
 
 import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.LoginRequest;
+import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface CommonMapper {
@@ -19,7 +25,7 @@ public interface CommonMapper {
     // Map register request to user
     User toUser(RegisterRequest registerRequest);
 
-    User toUser(UserDTO userDTO);
+    User toUser(RegisterForAdminRequest registerForAdminRequest);
 
     // Map product to product dto
     ProductDTO toProductDTO(Product product);
@@ -48,4 +54,17 @@ public interface CommonMapper {
     CartItemDTO toCartItemDTO(CartItem cartItem);
 
     ProductDTO toProductDTO(ProductDocument productDocument);
+
+    default Set<Role> map(List<String> roles) {
+        if (roles == null) {
+            return Collections.emptySet();
+        }
+        return roles.stream()
+                .map(roleName -> {
+                    Role role = new Role();
+                    role.setRoleName(roleName);
+                    return role;
+                })
+                .collect(Collectors.toSet());
+    }
 }

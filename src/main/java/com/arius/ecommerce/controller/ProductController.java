@@ -7,11 +7,13 @@ import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
 import com.arius.ecommerce.utils.CommonMapper;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @CrossOrigin("*")
