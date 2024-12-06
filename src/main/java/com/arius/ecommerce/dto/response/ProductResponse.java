@@ -16,6 +16,6 @@ public class ProductResponse implements Serializable {
     private int pageNumber;
     private int pageSize;
     private long totalElements;
-    private int totalPages;
-    private boolean lastPage;
+//    private int totalPages;
+//    private boolean lastPage;
 }

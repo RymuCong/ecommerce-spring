@@ -3,6 +3,8 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
+import com.arius.ecommerce.elasticsearch.ProductDocumentRepository;
+import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.elasticsearch.search.SearchUtil;
 import com.arius.ecommerce.entity.Cart;
@@ -43,20 +45,18 @@ public class ProductServiceImpl implements ProductService {
     private final CartRepository cartRepository;
     private final S3Service s3Service;
     private final CartService cartService;
-    private final RestHighLevelClient client;
     private final ElasticsearchIndexService elasticsearchIndexService;
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final SearchService searchService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, S3Service s3Service, CartService cartService, RestHighLevelClient client, ElasticsearchIndexService elasticsearchIndexService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.cartRepository = cartRepository;
         this.s3Service = s3Service;
         this.cartService = cartService;
-        this.client = client;
         this.elasticsearchIndexService = elasticsearchIndexService;
+        this.searchService = searchService;
     }
 
     @Override
@@ -106,8 +106,8 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-        productResponse.setTotalPages(pagedProducts.getTotalPages());
-        productResponse.setLastPage(pagedProducts.isLast());
+//        productResponse.setTotalPages(pagedProducts.getTotalPages());
+//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
     }
 
@@ -205,8 +205,8 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-        productResponse.setTotalPages(pagedProducts.getTotalPages());
-        productResponse.setLastPage(pagedProducts.isLast());
+//        productResponse.setTotalPages(pagedProducts.getTotalPages());
+//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
     }
 
@@ -217,21 +217,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "searchResults", key = "#searchRequestDTO.searchTerm")
     public ProductResponse search(SearchRequestDTO searchRequestDTO) {
-        SearchRequest requestDTO = SearchUtil.buildSearchRequest("product", searchRequestDTO);
-        List<ProductDocument> productDocumentList = searchInternal(requestDTO);
-        List<ProductDTO> productDTOList = productDocumentList.stream()
-                .map(CommonMapper.INSTANCE::toProductDTO)
-                .toList();
+        List<ProductDTO> productDTOs = searchService.searchNameAndDescription(searchRequestDTO);
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOList);
+        productResponse.setProducts(productDTOs);
         productResponse.setPageNumber(searchRequestDTO.getPageNumber());
         productResponse.setPageSize(searchRequestDTO.getPageSize());
-        productResponse.setTotalElements(productDTOList.size());
-        productResponse.setTotalPages((int) Math.ceil((double) productDTOList.size() / searchRequestDTO.getPageSize()));
-        productResponse.setLastPage(searchRequestDTO.getPageNumber() == productResponse.getTotalPages() - 1);
+        long totalElements = productDTOs.size(); // Assuming the total elements are the size of the result list
+        productResponse.setTotalElements(totalElements);
+//        int totalPages = (int) Math.ceil((double) totalElements / searchRequestDTO.getPageSize());
+//        productResponse.setTotalPages(totalPages);
+//        productResponse.setLastPage(searchRequestDTO.getPageNumber() == totalPages - 1);
 
         return productResponse;
     }
@@ -261,30 +258,8 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-        productResponse.setTotalPages(pagedProducts.getTotalPages());
-        productResponse.setLastPage(pagedProducts.isLast());
+//        productResponse.setTotalPages(pagedProducts.getTotalPages());
+//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
-    }
-
-    private List<ProductDocument> searchInternal(final SearchRequest request) {
-        if (request == null) {
-            return Collections.emptyList();
-        }
-
-        try {
-            final SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-
-            final SearchHit[] searchHits = response.getHits().getHits();
-            final List<ProductDocument> products = new ArrayList<>(searchHits.length);
-            for (SearchHit hit : searchHits) {
-                ProductDocument product = MAPPER.readValue(hit.getSourceAsString(), ProductDocument.class);
-                products.add(product);
-            }
-
-            return products;
-        } catch (Exception e) {
-            System.err.println("Error occurred while searching for products: " + e.getMessage());
-            return Collections.emptyList();
-        }
     }
 }

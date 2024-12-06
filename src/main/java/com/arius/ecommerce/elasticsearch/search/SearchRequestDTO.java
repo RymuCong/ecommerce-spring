@@ -10,7 +10,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearchRequestDTO extends PagedRequestDTO {
+public class SearchRequestDTO {
     private List<String> fields;
     private String searchTerm;
     private String sortBy;
@@ -18,4 +18,6 @@ public class SearchRequestDTO extends PagedRequestDTO {
     private long totalElements;
     private int totalPages;
     private boolean lastPage;
+    private int pageNumber;
+    private int pageSize;
 }

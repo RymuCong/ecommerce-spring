@@ -8,6 +8,9 @@ import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
 import com.arius.ecommerce.utils.CommonMapper;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -101,10 +104,41 @@ public class ProductController {
         return new ResponseEntity<>("Reload data successfully",HttpStatus.OK);
     }
 
-    @PostMapping("/public/product/search")
-    public ResponseEntity<?> searchProducts(
-            @RequestBody final SearchRequestDTO searchRequestDTO
-    ){
-        return new ResponseEntity<>(productService.search(searchRequestDTO), HttpStatus.OK);
+//    @PostMapping("/public/product/search")
+//    public ResponseEntity<?> searchProducts(
+//            @RequestBody final SearchRequestDTO searchRequestDTO
+//    ){
+//        ProductResponse productResponse = new ProductResponse();
+//        productResponse.setPageSize(searchRequestDTO.getPageSize());
+//
+//        List<ProductDTO> products = productService.search(searchRequestDTO);
+//
+//        productResponse.setProducts(products);
+//        productResponse.setPageNumber(searchRequestDTO.getPageNumber());
+//        productResponse.setTotalElements(products.size());
+//        productResponse.setTotalPages((int) Math.ceil((double) products.size() / searchRequestDTO.getPageSize()));
+//        productResponse.setLastPage(searchRequestDTO.getPageNumber() == productResponse.getTotalPages() - 1);
+//
+//        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+//    }
+
+    @GetMapping("/public/product/search")
+    public ResponseEntity<ProductResponse> searchProducts(
+            @RequestParam(name = "searchTerm") String searchTerm,
+            @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = "12") int pageSize,
+            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir
+    ) {
+        SearchRequestDTO searchRequestDTO = new SearchRequestDTO();
+        searchRequestDTO.setSearchTerm(searchTerm);
+        searchRequestDTO.setPageNumber(pageNumber);
+        searchRequestDTO.setPageSize(pageSize);
+        searchRequestDTO.setSortBy(sortBy);
+        searchRequestDTO.setOrder(SortOrder.fromString(sortDir));
+
+        ProductResponse productResponse = productService.search(searchRequestDTO);
+
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 }

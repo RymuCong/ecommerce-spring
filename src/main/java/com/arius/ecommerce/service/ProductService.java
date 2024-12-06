@@ -6,6 +6,7 @@ import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.arius.ecommerce.elasticsearch.search;
 
+import com.arius.ecommerce.config.AppConstants;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -39,10 +40,9 @@ public final class SearchUtil {
         } else {
             sourceBuilder.sort("id.keyword", SortOrder.ASC);
         }
-
         sourceBuilder.query(boolQuery);
-        sourceBuilder.from(searchRequestDTO.getPageNumber() * searchRequestDTO.getSize());
-        sourceBuilder.size(searchRequestDTO.getSize());
+        sourceBuilder.from(searchRequestDTO.getPageNumber() * searchRequestDTO.getPageSize());
+        sourceBuilder.size(searchRequestDTO.getPageSize());
 
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(sourceBuilder);
