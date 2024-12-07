@@ -17,6 +17,7 @@ import com.arius.ecommerce.repository.ProductRepository;
 import com.arius.ecommerce.repository.TagRepository;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -217,20 +218,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse search(SearchRequestDTO searchRequestDTO) {
-        List<ProductDTO> productDTOs = searchService.searchNameAndDescription(searchRequestDTO);
-
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
-        productResponse.setPageNumber(searchRequestDTO.getPageNumber());
-        productResponse.setPageSize(searchRequestDTO.getPageSize());
-        long totalElements = productDTOs.size(); // Assuming the total elements are the size of the result list
-        productResponse.setTotalElements(totalElements);
-//        int totalPages = (int) Math.ceil((double) totalElements / searchRequestDTO.getPageSize());
-//        productResponse.setTotalPages(totalPages);
-//        productResponse.setLastPage(searchRequestDTO.getPageNumber() == totalPages - 1);
-
-        return productResponse;
+    public ProductResponse search(SearchRequestDTO searchRequestDTO) throws JsonProcessingException {
+        return searchService.searchNameAndDescription(searchRequestDTO);
     }
 
     @Override

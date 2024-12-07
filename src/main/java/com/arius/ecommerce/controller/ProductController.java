@@ -7,6 +7,7 @@ import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
 import com.arius.ecommerce.service.ProductService;
 import com.arius.ecommerce.utils.CommonMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -104,34 +105,19 @@ public class ProductController {
         return new ResponseEntity<>("Reload data successfully",HttpStatus.OK);
     }
 
-//    @PostMapping("/public/product/search")
-//    public ResponseEntity<?> searchProducts(
-//            @RequestBody final SearchRequestDTO searchRequestDTO
-//    ){
-//        ProductResponse productResponse = new ProductResponse();
-//        productResponse.setPageSize(searchRequestDTO.getPageSize());
-//
-//        List<ProductDTO> products = productService.search(searchRequestDTO);
-//
-//        productResponse.setProducts(products);
-//        productResponse.setPageNumber(searchRequestDTO.getPageNumber());
-//        productResponse.setTotalElements(products.size());
-//        productResponse.setTotalPages((int) Math.ceil((double) products.size() / searchRequestDTO.getPageSize()));
-//        productResponse.setLastPage(searchRequestDTO.getPageNumber() == productResponse.getTotalPages() - 1);
-//
-//        return new ResponseEntity<>(productResponse, HttpStatus.OK);
-//    }
-
     @GetMapping("/public/product/search")
     public ResponseEntity<ProductResponse> searchProducts(
             @RequestParam(name = "searchTerm") String searchTerm,
             @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
             @RequestParam(name = "pageSize", defaultValue = "12") int pageSize,
             @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
-            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir
-    ) {
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            @RequestParam(name = "fields", required = false) String fields
+    ) throws JsonProcessingException {
+        List<String> fieldsList = fields != null ? Arrays.asList(fields.split(",")) : List.of("name", "description");
         SearchRequestDTO searchRequestDTO = new SearchRequestDTO();
         searchRequestDTO.setSearchTerm(searchTerm);
+        searchRequestDTO.setFields(fieldsList);
         searchRequestDTO.setPageNumber(pageNumber);
         searchRequestDTO.setPageSize(pageSize);
         searchRequestDTO.setSortBy(sortBy);

@@ -5,6 +5,7 @@ import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Product;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,7 @@ public interface ProductService {
 
     Product getProductById(Long productId);
 
-    ProductResponse search(SearchRequestDTO searchRequestDTO);
+    ProductResponse search(SearchRequestDTO searchRequestDTO) throws JsonProcessingException;
 
     void reloadElasticsearchData();
 
