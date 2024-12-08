@@ -2,12 +2,16 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
+import com.arius.ecommerce.dto.request.UserRequest;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -19,9 +23,11 @@ public interface UserService {
 
     UserResponse getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir);
 
+    List<UserDTO> getAllUsers();
+
     UserDTO getUser(HttpServletRequest request);
 
-    UserDTO updateUser(UserDTO dto, HttpServletRequest request);
+    UserRequest updateUser(UserRequest editUser, HttpServletRequest request);
 
     Long deleteUser(Long userId);
 
@@ -30,4 +36,6 @@ public interface UserService {
     AuthResponse registerAdmin(RegisterRequest registerRequest);
 
     UserDTO getUserById(Long userId);
+
+    List<UserDTO> importDataInExcelFile(MultipartFile file);
 }

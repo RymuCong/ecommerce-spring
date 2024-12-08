@@ -30,7 +30,7 @@ public class User {
 //    @Pattern(regexp = "^[a-zA-Z ]*$",message = "Last Name Should not contain any special characters or numbers")
     private String lastName;
 
-    @Size(min = 10, max = 10, message = "Mobile Number must be digits long")
+    @Size(min = 10, max = 10, message = "Mobile Number must be 10 digits long")
     @Pattern(regexp = "^\\d{10}$",message = "Mobile Number must contain only numbers")
     private String mobileNumber;
 
@@ -46,7 +46,7 @@ public class User {
     @JoinTable(name = "user_role",joinColumns = @JoinColumn(name = "user_id"),inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
     List<Address> addresses = new ArrayList<>();
 
     @OneToOne(mappedBy = "user",cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},orphanRemoval = true)

@@ -4,6 +4,7 @@ import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
+import com.arius.ecommerce.dto.request.UserRequest;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.entity.*;
 import org.mapstruct.Mapper;
@@ -41,6 +42,8 @@ public interface CommonMapper {
 
     AddressDTO toAddressDTO(Address address);
 
+    Address toAddress(AddressDTO addressDTO);
+
     CartDTO toCartDTO(Cart cart);
 
     OrderDTO toOrderDTO(Order order);
@@ -54,6 +57,8 @@ public interface CommonMapper {
     CartItemDTO toCartItemDTO(CartItem cartItem);
 
     ProductDTO toProductDTO(ProductDocument productDocument);
+
+    UserRequest toUserRequest(User user);
 
     default Set<Role> map(List<String> roles) {
         if (roles == null) {

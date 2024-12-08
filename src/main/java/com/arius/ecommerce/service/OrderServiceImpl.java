@@ -59,9 +59,13 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setEmail(user.getEmail());
-        order.setOrderDate(LocalDate.now());
         order.setTotalAmount(cart.getTotalPrice());
         order.setOrderStatus(OrderStatus.PENDING);
+        try {
+            order.setShippingAddress(user.getAddresses().get(0).getAddressDetail());
+        } catch (Exception e){
+            throw new APIException("Shipping Address is not available - only shipping for the 1st address");
+        }
 
         Payment payment = paymentRepository.findById(paymentMethodId).orElseThrow(() -> new ResourceNotFoundException("Payment","paymentMethodId",paymentMethodId));
 

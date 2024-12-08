@@ -13,4 +13,8 @@ public class AddressDTO {
 
     private String addressDetail;
 
+    @Override
+    public String toString() {
+        return addressDetail;
+    }
 }

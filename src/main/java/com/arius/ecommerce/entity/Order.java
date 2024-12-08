@@ -6,8 +6,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +20,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {
@@ -33,7 +37,8 @@ public class Order {
     @ToString.Exclude
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    private LocalDate orderDate;
+    @CreatedDate
+    private LocalDateTime orderDate;
 
     @ManyToOne
     @JsonBackReference
@@ -44,6 +49,9 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
+    @Column(length = 512,nullable = false)
+    private String shippingAddress;
 
     @Override
     public final boolean equals(Object o) {

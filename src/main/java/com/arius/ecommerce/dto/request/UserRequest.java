@@ -1,23 +1,22 @@
-package com.arius.ecommerce.dto;
+package com.arius.ecommerce.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.arius.ecommerce.dto.AddressDTO;
+import lombok.*;
 
 import java.util.List;
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+@ToString
+public class UserRequest {
 
     private Long userId;
+    private String password;
     private String firstName;
     private String lastName;
     private String mobileNumber;
     private String email;
-    private Set<RoleDTO> roles;
     private List<AddressDTO> addresses;
-    private CartDTO cartDTO;
 }

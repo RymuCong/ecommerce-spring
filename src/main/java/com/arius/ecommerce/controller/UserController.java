@@ -3,24 +3,23 @@ package com.arius.ecommerce.controller;
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
+import com.arius.ecommerce.dto.request.UserRequest;
 import com.arius.ecommerce.dto.response.LoginResponse;
 import com.arius.ecommerce.dto.response.UserResponse;
-import com.arius.ecommerce.entity.Role;
-import com.arius.ecommerce.entity.User;
-import com.arius.ecommerce.service.RoleService;
 import com.arius.ecommerce.service.UserService;
+import com.arius.ecommerce.utils.UserExcelExportUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -29,12 +28,9 @@ public class UserController {
 
     private final UserService userService;
 
-    private final RoleService roleService;
-
     @Autowired
-    public UserController(UserService userService, RoleService roleService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
     @GetMapping("/admin/users")
@@ -55,10 +51,10 @@ public class UserController {
         return new ResponseEntity<>(userDTO,HttpStatus.OK);
     }
 
-    @PutMapping("/user")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO dto, HttpServletRequest request){
+    @PatchMapping("/user")
+    public ResponseEntity<?> updateUser(@RequestBody UserRequest editUser, HttpServletRequest request){
 
-        UserDTO user = userService.updateUser(dto,request);
+        UserRequest user = userService.updateUser(editUser,request);
 
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
@@ -103,5 +99,29 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody RegisterForAdminRequest registerRequest) {
         UserDTO registeredUser = userService.registerUserForAdmin(registerRequest);
         return new ResponseEntity<>(registeredUser, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/users/importExcelData")
+    public ResponseEntity<?> importExcelData(@RequestParam("file") MultipartFile file) {
+        List<UserDTO> savedUsers = userService.importDataInExcelFile(file);
+        return new ResponseEntity<>(savedUsers, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/users/exportExcelData")
+    public ResponseEntity<?> exportExcelData(HttpServletResponse response) {
+        response.setContentType(("application/octet-stream"));
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment;filename=\"users-data-%s.xlsx\"", System.currentTimeMillis());
+
+        response.setHeader(headerKey, headerValue);
+
+        List<UserDTO> users = userService.getAllUsers();
+
+        UserExcelExportUtil excelExporter = new UserExcelExportUtil(users);
+        excelExporter.export(response);
+        return new ResponseEntity<>(
+                Collections.singletonMap("message", "User data exported successfully"),
+                HttpStatus.OK
+        );
     }
 }
