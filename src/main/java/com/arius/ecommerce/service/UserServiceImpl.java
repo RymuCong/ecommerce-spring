@@ -322,7 +322,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> importDataInExcelFile(MultipartFile file) {
+    public UserResponse importDataInExcelFile(MultipartFile file) throws APIException {
         // Check if file is empty
         if (file == null) {
             throw new NullPointerException("File is empty");
@@ -371,6 +371,9 @@ public class UserServiceImpl implements UserService {
             int lastRowNum = sheet.getLastRowNum();
             for (int i = 2; i <= lastRowNum; i++) { // for i = 2 because data start from row 3 -> index = 2
                 Row row = sheet.getRow(i);
+                if (row == null || row.getCell(1) == null || row.getCell(1).toString().trim().isEmpty()) {
+                    continue; // Skip empty or null rows
+                }
                 User user = convertRowToUser(row);
                 if (user != null) {
                     // Set role and bcrypt password
@@ -381,11 +384,21 @@ public class UserServiceImpl implements UserService {
                     user.setPassword(encoder.encode(user.getPassword()));
 
                     users.add(user);
-                    saveUserFromExcel(user);
+                    try {
+                        saveUserFromExcel(user);
+                    } catch (APIException ex) {
+                        throw new APIException(ex.getMessage());
+                    } catch (Exception e) {
+                        throw new APIException("Error saving user: " + user.getEmail());
+                    }
                 }
             }
             workbook.close();
-            return users.stream().map(UserServiceImpl::getReadUserDTO).toList();
+            List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
+            UserResponse userResponse = new UserResponse();
+            userResponse.setUsers(userDTOS);
+            userResponse.setTotalElements(userDTOS.size());
+            return userResponse;
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -415,18 +428,31 @@ public class UserServiceImpl implements UserService {
         }
 
         // Save user to the database
+        try {
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser != null) {
+                throw new APIException("User already exists with email " + user.getEmail());
+            }
+        } catch (Exception e) {
+            throw new APIException("Error saving user: " + user.getEmail());
+        }
         userRepository.save(user);
         cartService.createCart(user.getEmail());
     }
 
     private User convertRowToUser(Row row) {
-        if (row != null) {
+        if (row != null && row.getCell(1).toString() != null) {
             User user = new User();
             user.setEmail(getCellValue(row.getCell(1)).toString());
             user.setFirstName(getCellValue(row.getCell(2)).toString());
             user.setLastName(getCellValue(row.getCell(3)).toString());
             user.setMobileNumber(getCellValue(row.getCell(4)).toString());
-            user.setPassword(getCellValue(row.getCell(6)).toString());
+            Cell passwordCell = row.getCell(6);
+            if (passwordCell.getCellType() == CellType.STRING) {
+                user.setPassword(passwordCell.getStringCellValue());
+            }
+            else
+                throw new APIException("Password cell should be a string: " + user.getEmail());
             Set<Role> roles = new HashSet<>();
             Role role = new Role();
             role.setRoleName(getCellValue(row.getCell(5)).toString());

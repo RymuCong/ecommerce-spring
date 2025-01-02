@@ -37,5 +37,5 @@ public interface UserService {
 
     UserDTO getUserById(Long userId);
 
-    List<UserDTO> importDataInExcelFile(MultipartFile file);
+    UserResponse importDataInExcelFile(MultipartFile file);
 }

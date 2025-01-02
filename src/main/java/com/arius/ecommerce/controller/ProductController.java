@@ -114,7 +114,7 @@ public class ProductController {
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             @RequestParam(name = "fields", required = false) String fields
     ) throws JsonProcessingException {
-        List<String> fieldsList = fields != null ? Arrays.asList(fields.split(",")) : List.of("name", "description");
+        List<String> fieldsList = fields != null ? Arrays.asList(fields.split(",")) : List.of("name", "description", "tags", "category");
         SearchRequestDTO searchRequestDTO = new SearchRequestDTO();
         searchRequestDTO.setSearchTerm(searchTerm);
         searchRequestDTO.setFields(fieldsList);
@@ -127,4 +127,10 @@ public class ProductController {
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
+
+//    @PostMapping("/admin/product/importExcel")
+//    public ResponseEntity<?> importDataInExcelFile(@RequestParam("file") MultipartFile file) {
+//        ProductResponse productResponse = productService.importDataInExcelFile(file);
+//        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+//    }
 }

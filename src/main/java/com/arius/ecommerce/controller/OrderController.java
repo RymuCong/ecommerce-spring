@@ -74,14 +74,19 @@ public class OrderController {
     }
 
     @GetMapping("/user/orders")
-    public ResponseEntity<List<OrderDTO>> getOrdersByUser(HttpServletRequest request){
-
+    public ResponseEntity<?> getOrdersByUser(
+         HttpServletRequest request,
+         @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
+         @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
+         @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_ORDER_BY,required = false) String sortBy,
+         @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_DIR,required = false) String sortDir)
+    {
         String token = jwtUtils.extractToken(request);
         String emailId = jwtUtils.extractUserName(token);
 
-        List<OrderDTO> orderDTOS = orderService.getOrdersByUser(emailId);
+       OrderResponse orderResponse = orderService.getOrdersByUser(emailId,pageNumber,pageSize,sortBy,sortDir);
 
-        return new ResponseEntity<>(orderDTOS,HttpStatus.OK);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
 
     }
 

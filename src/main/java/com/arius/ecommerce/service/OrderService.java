@@ -12,7 +12,7 @@ public interface OrderService {
 
     OrderResponse getAllOrders(int pageNumber, int pageSize, String sortBy, String sortDir);
 
-    List<OrderDTO> getOrdersByUser(String emailId);
+    OrderResponse getOrdersByUser(String emailId, int pageNumber, int pageSize, String sortBy, String sortDir);
 
     OrderDTO getOrderByUser(String emailId, Long orderId);
 

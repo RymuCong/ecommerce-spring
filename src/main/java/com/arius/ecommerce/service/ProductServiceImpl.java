@@ -3,10 +3,8 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
-import com.arius.ecommerce.elasticsearch.ProductDocumentRepository;
 import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
-import com.arius.ecommerce.elasticsearch.search.SearchUtil;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.Category;
 import com.arius.ecommerce.entity.Product;
@@ -14,19 +12,11 @@ import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.CartRepository;
 import com.arius.ecommerce.repository.CategoryRepository;
 import com.arius.ecommerce.repository.ProductRepository;
-import com.arius.ecommerce.repository.TagRepository;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.SearchHit;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -107,8 +95,6 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-//        productResponse.setTotalPages(pagedProducts.getTotalPages());
-//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
     }
 
@@ -206,8 +192,6 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-//        productResponse.setTotalPages(pagedProducts.getTotalPages());
-//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
     }
 
@@ -247,8 +231,6 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
-//        productResponse.setTotalPages(pagedProducts.getTotalPages());
-//        productResponse.setLastPage(pagedProducts.isLast());
         return productResponse;
     }
 }

@@ -102,8 +102,8 @@ public class UserController {
     }
 
     @PostMapping("/admin/users/importExcelData")
-    public ResponseEntity<?> importExcelData(@RequestParam("file") MultipartFile file) {
-        List<UserDTO> savedUsers = userService.importDataInExcelFile(file);
+    public ResponseEntity<?> importExcelData(@RequestPart("file") MultipartFile file) {
+        UserResponse savedUsers = userService.importDataInExcelFile(file);
         return new ResponseEntity<>(savedUsers, HttpStatus.OK);
     }
 

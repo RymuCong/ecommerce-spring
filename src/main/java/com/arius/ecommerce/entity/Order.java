@@ -50,7 +50,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @Column(length = 512,nullable = false)
+    @Column(length = 512)
     private String shippingAddress;
 
     @Override

@@ -157,8 +157,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> getOrdersByUser(String emailId) {
-        List<Order> orders = orderRepository.findByEmail(emailId);
+    public OrderResponse getOrdersByUser(String emailId, int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,sort);
+
+        Page<Order> pageOrders = orderRepository.findByEmail(emailId, pageable);
+
+        List<Order> orders = pageOrders.getContent();
 
         List<OrderDTO> orderDTOS = orders.stream().map(CommonMapper.INSTANCE::toOrderDTO).toList();
 
@@ -166,7 +173,15 @@ public class OrderServiceImpl implements OrderService {
             throw new APIException("No Orders placed yet by the user " + emailId);
         }
 
-        return orderDTOS;
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setContent(orderDTOS);
+        orderResponse.setPageNumber(pageOrders.getNumber());
+        orderResponse.setPageSize(pageOrders.getSize());
+        orderResponse.setTotalElements(pageOrders.getTotalElements());
+        orderResponse.setTotalPages(pageOrders.getTotalPages());
+        orderResponse.setLastPage(pageOrders.isLast());
+
+        return orderResponse;
     }
 
     @Transactional
