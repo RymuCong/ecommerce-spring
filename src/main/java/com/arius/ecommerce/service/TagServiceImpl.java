@@ -3,7 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
 import com.arius.ecommerce.dto.response.TagResponse;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.entity.Tag;
 import com.arius.ecommerce.exception.APIException;
 import com.arius.ecommerce.repository.ProductRepository;

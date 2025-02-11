@@ -1,5 +1,6 @@
 package com.arius.ecommerce.entity;
 
+import com.arius.ecommerce.entity.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;

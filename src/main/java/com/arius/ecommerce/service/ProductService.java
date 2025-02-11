@@ -2,15 +2,10 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
-import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface ProductService {
 

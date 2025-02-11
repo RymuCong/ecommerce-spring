@@ -1,12 +1,10 @@
 package com.arius.ecommerce.service;
 
-import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.CartDTO;
 import com.arius.ecommerce.dto.CartItemDTO;
-import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.CartItem;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.exception.APIException;
 import com.arius.ecommerce.exception.ResourceNotFoundException;

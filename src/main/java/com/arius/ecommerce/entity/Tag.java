@@ -1,5 +1,6 @@
 package com.arius.ecommerce.entity;
 
+import com.arius.ecommerce.entity.product.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

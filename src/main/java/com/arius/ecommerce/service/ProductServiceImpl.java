@@ -7,7 +7,7 @@ import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.Category;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.CartRepository;
 import com.arius.ecommerce.repository.CategoryRepository;

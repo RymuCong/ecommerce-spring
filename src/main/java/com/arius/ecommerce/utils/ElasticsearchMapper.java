@@ -1,7 +1,7 @@
 package com.arius.ecommerce.utils;
 
 import com.arius.ecommerce.elasticsearch.ProductDocument;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 
 import java.util.Collections;
 import java.util.stream.Collectors;

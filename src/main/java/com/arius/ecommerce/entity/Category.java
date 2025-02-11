@@ -1,5 +1,6 @@
 package com.arius.ecommerce.entity;
 
+import com.arius.ecommerce.entity.product.Product;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

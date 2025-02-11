@@ -1,5 +1,9 @@
-package com.arius.ecommerce.entity;
+package com.arius.ecommerce.entity.product;
 
+import com.arius.ecommerce.entity.CartItem;
+import com.arius.ecommerce.entity.Category;
+import com.arius.ecommerce.entity.OrderItem;
+import com.arius.ecommerce.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

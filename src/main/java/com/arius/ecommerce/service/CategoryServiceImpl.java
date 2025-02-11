@@ -3,7 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.CategoryDTO;
 import com.arius.ecommerce.dto.response.CategoryResponse;
 import com.arius.ecommerce.entity.Category;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.exception.APIException;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.CategoryRepository;

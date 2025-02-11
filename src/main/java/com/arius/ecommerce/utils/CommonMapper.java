@@ -7,6 +7,7 @@ import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.request.UserRequest;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.entity.*;
+import com.arius.ecommerce.entity.product.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

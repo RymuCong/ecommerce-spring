@@ -3,6 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.OrderDTO;
 import com.arius.ecommerce.dto.response.OrderResponse;
 import com.arius.ecommerce.entity.*;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.exception.APIException;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.*;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

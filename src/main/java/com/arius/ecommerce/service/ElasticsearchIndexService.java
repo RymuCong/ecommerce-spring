@@ -1,7 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.elasticsearch.ProductDocument;
-import com.arius.ecommerce.entity.Product;
+import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.repository.ProductRepository;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
