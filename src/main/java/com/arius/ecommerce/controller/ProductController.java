@@ -1,14 +1,18 @@
 package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.config.AppConstants;
+import com.arius.ecommerce.dto.AttributeDTO;
+import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
+import com.arius.ecommerce.service.AttributeTypeService;
 import com.arius.ecommerce.service.ProductService;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +27,12 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final AttributeTypeService attributeTypeService;
 
-    public ProductController(ProductService productService) {
+    @Autowired
+    public ProductController(ProductService productService, AttributeTypeService attributeTypeService) {
         this.productService = productService;
+        this.attributeTypeService = attributeTypeService;
     }
 
     @PostMapping("/admin/product/add")
@@ -123,6 +130,17 @@ public class ProductController {
         ProductResponse productResponse = productService.search(searchRequestDTO);
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/product/attribute_type")
+    public ResponseEntity<?> addAttributeType(@RequestBody AttributeTypeDTO attributeTypeDTO) {
+        attributeTypeService.addAttributeType(attributeTypeDTO);
+        return new ResponseEntity<>(attributeTypeDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/product/attribute")
+    public ResponseEntity<?> addAttribute(@RequestBody AttributeDTO attributeDTO) {
+        return new ResponseEntity<>(productService.addAttribute(attributeDTO), HttpStatus.OK);
     }
 
 //    @PostMapping("/admin/product/importExcel")

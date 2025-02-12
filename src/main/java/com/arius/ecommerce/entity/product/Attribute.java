@@ -1,6 +1,7 @@
 package com.arius.ecommerce.entity.product;
 
 import com.arius.ecommerce.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,5 +24,6 @@ public class Attribute extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "attribute_type_id")
+    @JsonBackReference
     private AttributeType attributeType;
 }
