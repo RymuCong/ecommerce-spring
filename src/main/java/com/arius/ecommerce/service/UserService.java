@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
+
 
 public interface UserService {
     AuthResponse loginUser(LoginRequest loginRequest);

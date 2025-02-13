@@ -3,7 +3,6 @@ package com.arius.ecommerce.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,7 +11,7 @@ import java.util.UUID;
 @ToString
 public class VariantDTO {
 
-    private UUID variantId;
+    private String variantId;
 
     private String name;
 
