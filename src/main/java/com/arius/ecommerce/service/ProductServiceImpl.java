@@ -3,6 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.AttributeDTO;
 import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
+import com.arius.ecommerce.dto.VariantDTO;
 import com.arius.ecommerce.dto.response.AttributeResponseDTO;
 import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.dto.response.ProductResponse;
@@ -15,6 +16,7 @@ import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.entity.product.Attribute;
 import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.entity.product.Product;
+import com.arius.ecommerce.entity.product.Variant;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.*;
 import com.arius.ecommerce.security.UserPrincipal;
@@ -32,7 +34,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final CartRepository cartRepository;
     private final AttributeRepository attributeRepository;
     private final AttributeTypeRepository attributeTypeRepository;
+    private final VariantRepository variantRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final CartService cartService;
@@ -50,12 +55,13 @@ public class ProductServiceImpl implements ProductService {
     private final SearchService searchService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, AttributeRepository attributeRepository, AttributeTypeRepository attributeTypeRepository, UserRepository userRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, AttributeRepository attributeRepository, AttributeTypeRepository attributeTypeRepository, VariantRepository variantRepository, UserRepository userRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.cartRepository = cartRepository;
         this.attributeRepository = attributeRepository;
         this.attributeTypeRepository = attributeTypeRepository;
+        this.variantRepository = variantRepository;
         this.userRepository = userRepository;
         this.s3Service = s3Service;
         this.cartService = cartService;
@@ -288,5 +294,22 @@ public class ProductServiceImpl implements ProductService {
         saved_attributeTypeDTO.setUpdatedBy(user.getUserId());
         saved_attributeTypeDTO.setCreatedBy(user.getUserId());
         return saved_attributeTypeDTO;
+    }
+
+    @Override
+    public List<VariantDTO> addVariant(Long productId, List<String> attributeTypeList) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        List<Attribute> attributes = attributeRepository.findByAttributeTypeAttributeTypeIdIn(attributeTypeList);
+        List<Variant> variants = new ArrayList<>();
+        for (Attribute attribute : attributes) {
+            Variant variant = new Variant();
+            variant.setProduct(product);
+            variant.setName(product.getProductName() + " - " + attribute.getValue());
+            variant.setPrice(BigDecimal.valueOf(product.getPrice()));
+            variants.add(variant);
+        }
+        List<Variant> savedVariants = variantRepository.saveAll(variants);
+        return savedVariants.stream().map(variant -> ManualMapper.toVariantDTO(variant)).toList();
     }
 }

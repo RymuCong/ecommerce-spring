@@ -1,9 +1,11 @@
 package com.arius.ecommerce.utils;
 
+import com.arius.ecommerce.dto.VariantDTO;
 import com.arius.ecommerce.dto.response.AttributeResponseDTO;
 import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.entity.product.Attribute;
 import com.arius.ecommerce.entity.product.AttributeType;
+import com.arius.ecommerce.entity.product.Variant;
 
 public class ManualMapper {
 
@@ -29,5 +31,16 @@ public class ManualMapper {
         attributeTypeResponse.setUpdatedBy(attributeType.getUpdatedBy().getUserId());
         attributeTypeResponse.setUpdatedAt(attributeType.getUpdatedAt());
         return attributeTypeResponse;
+    }
+
+    public static VariantDTO toVariantDTO(Variant variant) {
+        VariantDTO variantDTO = new VariantDTO();
+        variantDTO.setVariantId(variant.getVariantId());
+        variantDTO.setName(variant.getName());
+        variantDTO.setPrice(variant.getPrice());
+        variantDTO.setQuantity(variant.getQuantity());
+        variantDTO.setProductId(variant.getProduct().getProductId());
+        variantDTO.setAttributeIds(variant.getAttributes().stream().map(attribute -> Long.valueOf(attribute.getAttributeId())).toArray(Long[]::new));
+        return variantDTO;
     }
 }

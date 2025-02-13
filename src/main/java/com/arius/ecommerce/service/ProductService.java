@@ -3,6 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.AttributeDTO;
 import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
+import com.arius.ecommerce.dto.VariantDTO;
 import com.arius.ecommerce.dto.response.AttributeResponseDTO;
 import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.dto.response.ProductResponse;
@@ -10,6 +11,8 @@ import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface ProductService {
 
@@ -38,5 +41,7 @@ public interface ProductService {
     AttributeResponseDTO addAttribute(AttributeDTO attributeDTO);
 
     AttributeTypeResponse addAttributeType(AttributeTypeDTO attributeTypeDTO);
+
+    List<VariantDTO> addVariant(Long productId, List<String> attributeTypeIdList);
 
 }

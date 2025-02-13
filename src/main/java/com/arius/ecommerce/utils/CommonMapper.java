@@ -69,6 +69,8 @@ public interface CommonMapper {
 
     VariantDTO toVariantDTO(Variant variant);
 
+    Variant toVariant(VariantDTO variantDTO);
+
     default Set<Role> map(List<String> roles) {
         if (roles == null) {
             return Collections.emptySet();
