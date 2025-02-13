@@ -1,8 +1,10 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.AttributeDTO;
+import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.AttributeResponseDTO;
+import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.SearchService;
@@ -269,5 +271,22 @@ public class ProductServiceImpl implements ProductService {
         saved_attributeDTO.setUpdatedBy(user.getUserId());
         saved_attributeDTO.setCreatedBy(user.getUserId());
         return saved_attributeDTO;
+    }
+
+    @Override
+    public AttributeTypeResponse addAttributeType(AttributeTypeDTO attributeTypeDTO) {
+        AttributeType attributeType = new AttributeType();
+        User user = getCurrentUser();
+        attributeType.setName(attributeTypeDTO.getName());
+        attributeType.setDescription(attributeTypeDTO.getDescription());
+        attributeType.setCreatedBy(user);
+        attributeType.setUpdatedBy(user);
+        attributeType.setCreatedAt(LocalDateTime.now());
+        attributeType.setUpdatedAt(LocalDateTime.now());
+        attributeTypeRepository.save(attributeType);
+        AttributeTypeResponse saved_attributeTypeDTO = ManualMapper.toAttributeTypeResponse(attributeType);
+        saved_attributeTypeDTO.setUpdatedBy(user.getUserId());
+        saved_attributeTypeDTO.setCreatedBy(user.getUserId());
+        return saved_attributeTypeDTO;
     }
 }

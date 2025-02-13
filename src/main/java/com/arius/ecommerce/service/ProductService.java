@@ -1,8 +1,10 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.AttributeDTO;
+import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.AttributeResponseDTO;
+import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
@@ -34,5 +36,7 @@ public interface ProductService {
     ProductResponse getLatestProducts();
 
     AttributeResponseDTO addAttribute(AttributeDTO attributeDTO);
+
+    AttributeTypeResponse addAttributeType(AttributeTypeDTO attributeTypeDTO);
 
 }

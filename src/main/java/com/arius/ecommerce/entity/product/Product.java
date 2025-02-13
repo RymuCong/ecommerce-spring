@@ -41,6 +41,12 @@ public class Product {
 
     private String image;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @Column(name = "thumbnail", columnDefinition = "TEXT")
+    private String thumbnail;
+
     @NotBlank
     @Size(min = 6, message = "Product description should have at least 6 characters")
     @Column(columnDefinition = "TEXT")
@@ -74,6 +80,9 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @ToString.Exclude
     private List<Tag> tags;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Variant> variants = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;

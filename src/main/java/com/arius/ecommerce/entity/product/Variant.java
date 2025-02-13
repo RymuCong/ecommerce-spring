@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,9 +20,9 @@ import java.util.List;
 @AllArgsConstructor
 public class Variant extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long variantId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "variant_id", updatable = false, nullable = false, columnDefinition = "UUID")
+    private UUID variantId;
 
     private String name;
 

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,8 +20,9 @@ import java.util.List;
 public class AttributeType extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long attributeTypeId;
+    @GeneratedValue(generator = "UUID")
+    @Column(name = "attribute_type_id", updatable = false, nullable = false, columnDefinition = "UUID")
+    private UUID attributeTypeId;
 
     private String name;
 

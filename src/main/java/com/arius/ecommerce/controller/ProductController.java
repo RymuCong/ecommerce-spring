@@ -7,7 +7,6 @@ import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
-import com.arius.ecommerce.service.AttributeTypeService;
 import com.arius.ecommerce.service.ProductService;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,12 +26,10 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final AttributeTypeService attributeTypeService;
 
     @Autowired
-    public ProductController(ProductService productService, AttributeTypeService attributeTypeService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
-        this.attributeTypeService = attributeTypeService;
     }
 
     @PostMapping("/admin/product/add")
@@ -134,8 +131,7 @@ public class ProductController {
 
     @PostMapping("/admin/product/attribute_type")
     public ResponseEntity<?> addAttributeType(@RequestBody AttributeTypeDTO attributeTypeDTO) {
-        attributeTypeService.addAttributeType(attributeTypeDTO);
-        return new ResponseEntity<>(attributeTypeDTO, HttpStatus.OK);
+        return new ResponseEntity<>(productService.addAttributeType(attributeTypeDTO), HttpStatus.OK);
     }
 
     @PostMapping("/admin/product/attribute")

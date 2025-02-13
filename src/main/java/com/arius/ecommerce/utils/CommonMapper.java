@@ -11,6 +11,7 @@ import com.arius.ecommerce.entity.*;
 import com.arius.ecommerce.entity.product.Attribute;
 import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.entity.product.Product;
+import com.arius.ecommerce.entity.product.Variant;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -65,6 +66,8 @@ public interface CommonMapper {
     UserRequest toUserRequest(User user);
 
     AttributeType toAttributeType(AttributeTypeDTO attributeTypeDTO);
+
+    VariantDTO toVariantDTO(Variant variant);
 
     default Set<Role> map(List<String> roles) {
         if (roles == null) {
