@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -142,7 +143,12 @@ public class ProductController {
 
     @PostMapping("/admin/product/create-variant")
     public ResponseEntity<?> createVariant(@RequestParam("productId") Long productId, @RequestBody List<String> attributeTypeIdList) {
-        return new ResponseEntity<>(productService.addVariant(productId, attributeTypeIdList), HttpStatus.OK);
+        return new ResponseEntity<>(productService.addAllVariant(productId, attributeTypeIdList), HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/product/create-custom-variant")
+    public ResponseEntity<?> createCustomVariant(@RequestParam("productId") Long productId, @RequestBody Map<String, List<String>> selectedAttributes) {
+        return new ResponseEntity<>(productService.addAllCustomVariant(productId, selectedAttributes), HttpStatus.OK);
     }
 
 //    @PostMapping("/admin/product/importExcel")

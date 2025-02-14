@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
 
@@ -42,6 +43,8 @@ public interface ProductService {
 
     AttributeTypeResponse addAttributeType(AttributeTypeDTO attributeTypeDTO);
 
-    List<VariantDTO> addVariant(Long productId, List<String> attributeTypeIdList);
+    List<VariantDTO> addAllVariant(Long productId, List<String> attributeTypeIdList);
+
+    List<VariantDTO> addAllCustomVariant(Long productId, Map<String, List<String>> selectedAttributes);
 
 }

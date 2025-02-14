@@ -299,7 +299,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<VariantDTO> addVariant(Long productId, List<String> attributeTypeList) {
+    public List<VariantDTO> addAllVariant(Long productId, List<String> attributeTypeList) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
@@ -328,10 +328,56 @@ public class ProductServiceImpl implements ProductService {
         }
 
         List<Variant> savedVariants = variantRepository.saveAll(variants);
+
+        // Attach variants to product
+        product.getVariants().addAll(savedVariants);
+        productRepository.save(product);
+
+        return savedVariants.stream().map(ManualMapper::toVariantDTO).toList();
+    }
+
+    @Override
+    public List<VariantDTO> addAllCustomVariant(Long productId, Map<String, List<String>> selectedAttributes) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        // Fetch attributes based on selected attribute IDs
+        List<Attribute> attributes = attributeRepository.findByAttributeIdIn(
+                selectedAttributes.values().stream().flatMap(List::stream).collect(Collectors.toList())
+        );
+
+        // Group attributes by their types
+        Map<String, List<Attribute>> attributesByType = attributes.stream()
+                .collect(Collectors.groupingBy(attribute -> attribute.getAttributeType().getAttributeTypeId()));
+
+        // Generate all combinations of selected attributes
+        List<List<Attribute>> attributeCombinations = new ArrayList<>(attributesByType.values());
+        List<List<Attribute>> cartesianProduct = cartesianProduct(attributeCombinations);
+
+        // Create variants for each combination
+        List<Variant> variants = new ArrayList<>();
+        for (List<Attribute> combination : cartesianProduct) {
+            Variant variant = new Variant();
+            variant.setProduct(product);
+            variant.setName(product.getProductName() + " - " + combination.stream()
+                    .map(Attribute::getValue)
+                    .collect(Collectors.joining(" - ")));
+            variant.setPrice(BigDecimal.valueOf(product.getPrice()));
+            variant.setAttributes(combination);
+            variants.add(variant);
+        }
+
+        List<Variant> savedVariants = variantRepository.saveAll(variants);
+
+        // Attach variants to product
+        product.getVariants().addAll(savedVariants);
+        productRepository.save(product);
+
         return savedVariants.stream().map(ManualMapper::toVariantDTO).toList();
     }
 
     // Helper method to generate Cartesian product
+    // This method will generate all possible combinations of attributes ex: [A1, A2], [B1, B2] => [A1, B1], [A1, B2], [A2, B1], [A2, B2]
     private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
         List<List<T>> resultLists = new ArrayList<>();
         if (lists.isEmpty()) {

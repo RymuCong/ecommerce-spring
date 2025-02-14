@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AttributeRepository extends JpaRepository<Attribute, String> {
     List<Attribute> findByAttributeTypeAttributeTypeIdIn(List<String> attributeTypeIdList);
+
+    List<Attribute> findByAttributeIdIn(List<String> attributeIdList);
 }
