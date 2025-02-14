@@ -145,7 +145,6 @@ public class ProductController {
         return new ResponseEntity<>(productService.addVariant(productId, attributeTypeIdList), HttpStatus.OK);
     }
 
-
 //    @PostMapping("/admin/product/importExcel")
 //    public ResponseEntity<?> importDataInExcelFile(@RequestParam("file") MultipartFile file) {
 //        ProductResponse productResponse = productService.importDataInExcelFile(file);

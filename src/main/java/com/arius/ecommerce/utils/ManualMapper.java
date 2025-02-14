@@ -40,7 +40,8 @@ public class ManualMapper {
         variantDTO.setPrice(variant.getPrice());
         variantDTO.setQuantity(variant.getQuantity());
         variantDTO.setProductId(variant.getProduct().getProductId());
-        variantDTO.setAttributeIds(variant.getAttributes().stream().map(attribute -> Long.valueOf(attribute.getAttributeId())).toArray(Long[]::new));
+        String[] attributeIds = variant.getAttributes().stream().map(Attribute::getAttributeId).toArray(String[]::new);
+        variantDTO.setAttributeIds(attributeIds);
         return variantDTO;
     }
 }

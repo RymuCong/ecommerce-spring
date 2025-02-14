@@ -38,6 +38,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -300,16 +302,53 @@ public class ProductServiceImpl implements ProductService {
     public List<VariantDTO> addVariant(Long productId, List<String> attributeTypeList) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        // Fetch attributes based on attribute type IDs
         List<Attribute> attributes = attributeRepository.findByAttributeTypeAttributeTypeIdIn(attributeTypeList);
+
+        // Group attributes by their types
+        Map<String, List<Attribute>> attributesByType = attributes.stream()
+                .collect(Collectors.groupingBy(attribute -> attribute.getAttributeType().getAttributeTypeId()));
+
+        // Generate all combinations of attributes
+        List<List<Attribute>> attributeCombinations = new ArrayList<>(attributesByType.values());
+        List<List<Attribute>> cartesianProduct = cartesianProduct(attributeCombinations);
+
+        // Create variants for each combination
         List<Variant> variants = new ArrayList<>();
-        for (Attribute attribute : attributes) {
+        for (List<Attribute> combination : cartesianProduct) {
             Variant variant = new Variant();
             variant.setProduct(product);
-            variant.setName(product.getProductName() + " - " + attribute.getValue());
+            variant.setName(product.getProductName() + " - " + combination.stream()
+                    .map(Attribute::getValue)
+                    .collect(Collectors.joining("-")));
             variant.setPrice(BigDecimal.valueOf(product.getPrice()));
+            variant.setAttributes(combination);
             variants.add(variant);
         }
+
         List<Variant> savedVariants = variantRepository.saveAll(variants);
-        return savedVariants.stream().map(variant -> ManualMapper.toVariantDTO(variant)).toList();
+        return savedVariants.stream().map(ManualMapper::toVariantDTO).toList();
+    }
+
+    // Helper method to generate Cartesian product
+    private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
+        List<List<T>> resultLists = new ArrayList<>();
+        if (lists.isEmpty()) {
+            resultLists.add(new ArrayList<>());
+            return resultLists;
+        } else {
+            List<T> firstList = lists.get(0);
+            List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
+            for (T condition : firstList) {
+                for (List<T> remainingList : remainingLists) {
+                    ArrayList<T> resultList = new ArrayList<>();
+                    resultList.add(condition);
+                    resultList.addAll(remainingList);
+                    resultLists.add(resultList);
+                }
+            }
+        }
+        return resultLists;
     }
 }

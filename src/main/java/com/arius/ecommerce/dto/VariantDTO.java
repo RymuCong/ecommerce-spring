@@ -21,5 +21,5 @@ public class VariantDTO {
 
     private Long productId;
 
-    private Long[] attributeIds;
+    private String[] attributeIds;
 }
