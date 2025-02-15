@@ -3,7 +3,7 @@ package com.arius.ecommerce.controller;
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.service.AttributeService;
 import com.arius.ecommerce.service.AttributeTypeService;
-import com.arius.ecommerce.service.ProductService;
+import com.arius.ecommerce.service.VariantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,15 @@ import java.util.Map;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api")
-public class ProductVariantController {
+public class AttributeVariantController {
 
-    private final ProductService productService;
+    private final VariantService variantService;
     private final AttributeService attributeService;
     private final AttributeTypeService attributeTypeService;
 
     @Autowired
-    public ProductVariantController(ProductService productService, AttributeService attributeService, AttributeTypeService attributeTypeService) {
-        this.productService = productService;
+    public AttributeVariantController(VariantService variantService, AttributeService attributeService, AttributeTypeService attributeTypeService) {
+        this.variantService = variantService;
         this.attributeService = attributeService;
         this.attributeTypeService = attributeTypeService;
     }
@@ -43,12 +43,35 @@ public class ProductVariantController {
 
     @PostMapping("/admin/product/create-variant")
     public ResponseEntity<?> createVariant(@RequestParam("productId") Long productId, @RequestBody List<String> attributeTypeIdList) {
-        return new ResponseEntity<>(productService.addAllVariant(productId, attributeTypeIdList), HttpStatus.OK);
+        return new ResponseEntity<>(variantService.addAllVariant(productId, attributeTypeIdList), HttpStatus.OK);
     }
 
     @PostMapping("/admin/product/create-custom-variant")
     public ResponseEntity<?> createCustomVariant(@RequestParam("productId") Long productId, @RequestBody Map<String, List<String>> selectedAttributes) {
-        return new ResponseEntity<>(productService.addAllCustomVariant(productId, selectedAttributes), HttpStatus.OK);
+        return new ResponseEntity<>(variantService.addAllCustomVariant(productId, selectedAttributes), HttpStatus.OK);
+    }
+
+    @GetMapping("/public/product/{productId}/variants")
+    public ResponseEntity<?> getVariantsByProductId(@PathVariable Long productId) {
+        return new ResponseEntity<>(variantService.getVariantsByProductId(productId), HttpStatus.OK);
+    }
+
+    @GetMapping("/public/variant/{variantId}")
+    public ResponseEntity<?> getVariantById(@PathVariable String variantId) {
+        return new ResponseEntity<>(variantService.getVariantById(variantId), HttpStatus.OK);
+    }
+
+    @PatchMapping("/admin/variant/{variantId}")
+    public ResponseEntity<?> updateVariant(@PathVariable String variantId, @RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String price = request.get("price");
+        String quantity = request.get("quantity");
+        return new ResponseEntity<>(variantService.updateVariant(variantId, name, price, quantity), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/admin/variant/{variantId}")
+    public ResponseEntity<?> deleteVariant(@PathVariable String variantId) {
+        return new ResponseEntity<>(variantService.deleteVariant(variantId), HttpStatus.OK);
     }
 
     @GetMapping("/public/attribute-type")
@@ -76,6 +99,11 @@ public class ProductVariantController {
     @DeleteMapping("/admin/attribute-type/{attributeTypeId}")
     public ResponseEntity<?> deleteAttributeType(@PathVariable String attributeTypeId) {
         return new ResponseEntity<>(attributeTypeService.deleteAttributeType(attributeTypeId), HttpStatus.OK);
+    }
+
+    @GetMapping("/public/attribute/{attributeId}")
+    public ResponseEntity<?> getAttribute(@PathVariable String attributeId) {
+        return new ResponseEntity<>(attributeService.getAttributeById(attributeId), HttpStatus.OK);
     }
 
     @PatchMapping("/admin/attribute/{attributeId}")

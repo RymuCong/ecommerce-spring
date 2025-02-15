@@ -1,21 +1,17 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
-import com.arius.ecommerce.dto.VariantDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.Category;
-import com.arius.ecommerce.entity.product.Attribute;
 import com.arius.ecommerce.entity.product.Product;
-import com.arius.ecommerce.entity.product.Variant;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.*;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
-import com.arius.ecommerce.utils.ManualMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -38,20 +30,16 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final CartRepository cartRepository;
-    private final AttributeRepository attributeRepository;
-    private final VariantRepository variantRepository;
     private final S3Service s3Service;
     private final CartService cartService;
     private final ElasticsearchIndexService elasticsearchIndexService;
     private final SearchService searchService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, AttributeRepository attributeRepository, VariantRepository variantRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.cartRepository = cartRepository;
-        this.attributeRepository = attributeRepository;
-        this.variantRepository = variantRepository;
         this.s3Service = s3Service;
         this.cartService = cartService;
         this.elasticsearchIndexService = elasticsearchIndexService;
@@ -244,103 +232,4 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
-    @Override
-    public List<VariantDTO> addAllVariant(Long productId, List<String> attributeTypeList) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-        // Fetch attributes based on attribute type IDs
-        List<Attribute> attributes = attributeRepository.findByAttributeTypeAttributeTypeIdIn(attributeTypeList);
-
-        // Group attributes by their types
-        Map<String, List<Attribute>> attributesByType = attributes.stream()
-                .collect(Collectors.groupingBy(attribute -> attribute.getAttributeType().getAttributeTypeId()));
-
-        // Generate all combinations of attributes
-        List<List<Attribute>> attributeCombinations = new ArrayList<>(attributesByType.values());
-        List<List<Attribute>> cartesianProduct = cartesianProduct(attributeCombinations);
-
-        // Create variants for each combination
-        List<Variant> variants = new ArrayList<>();
-        for (List<Attribute> combination : cartesianProduct) {
-            Variant variant = new Variant();
-            variant.setProduct(product);
-            variant.setName(product.getProductName() + " - " + combination.stream()
-                    .map(Attribute::getValue)
-                    .collect(Collectors.joining("-")));
-            variant.setPrice(BigDecimal.valueOf(product.getPrice()));
-            variant.setAttributes(combination);
-            variants.add(variant);
-        }
-
-        List<Variant> savedVariants = variantRepository.saveAll(variants);
-
-        // Attach variants to product
-        product.getVariants().addAll(savedVariants);
-        productRepository.save(product);
-
-        return savedVariants.stream().map(ManualMapper::toVariantDTO).toList();
-    }
-
-    @Override
-    public List<VariantDTO> addAllCustomVariant(Long productId, Map<String, List<String>> selectedAttributes) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-        // Fetch attributes based on selected attribute IDs
-        List<Attribute> attributes = attributeRepository.findByAttributeIdIn(
-                selectedAttributes.values().stream().flatMap(List::stream).collect(Collectors.toList())
-        );
-
-        // Group attributes by their types
-        Map<String, List<Attribute>> attributesByType = attributes.stream()
-                .collect(Collectors.groupingBy(attribute -> attribute.getAttributeType().getAttributeTypeId()));
-
-        // Generate all combinations of selected attributes
-        List<List<Attribute>> attributeCombinations = new ArrayList<>(attributesByType.values());
-        List<List<Attribute>> cartesianProduct = cartesianProduct(attributeCombinations);
-
-        // Create variants for each combination
-        List<Variant> variants = new ArrayList<>();
-        for (List<Attribute> combination : cartesianProduct) {
-            Variant variant = new Variant();
-            variant.setProduct(product);
-            variant.setName(product.getProductName() + " - " + combination.stream()
-                    .map(Attribute::getValue)
-                    .collect(Collectors.joining(" - ")));
-            variant.setPrice(BigDecimal.valueOf(product.getPrice()));
-            variant.setAttributes(combination);
-            variants.add(variant);
-        }
-
-        List<Variant> savedVariants = variantRepository.saveAll(variants);
-
-        // Attach variants to product
-        product.getVariants().addAll(savedVariants);
-        productRepository.save(product);
-
-        return savedVariants.stream().map(ManualMapper::toVariantDTO).toList();
-    }
-
-    // Helper method to generate Cartesian product
-    // This method will generate all possible combinations of attributes ex: [A1, A2], [B1, B2] => [A1, B1], [A1, B2], [A2, B1], [A2, B2]
-    private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
-        List<List<T>> resultLists = new ArrayList<>();
-        if (lists.isEmpty()) {
-            resultLists.add(new ArrayList<>());
-            return resultLists;
-        } else {
-            List<T> firstList = lists.get(0);
-            List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
-            for (T condition : firstList) {
-                for (List<T> remainingList : remainingLists) {
-                    ArrayList<T> resultList = new ArrayList<>();
-                    resultList.add(condition);
-                    resultList.addAll(remainingList);
-                    resultLists.add(resultList);
-                }
-            }
-        }
-        return resultLists;
-    }
 }

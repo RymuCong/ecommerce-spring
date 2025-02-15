@@ -1,17 +1,11 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
-import com.arius.ecommerce.dto.VariantDTO;
-import com.arius.ecommerce.dto.AttributeDTO;
-import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Map;
 
 public interface ProductService {
 
@@ -36,9 +30,5 @@ public interface ProductService {
     void reloadElasticsearchData();
 
     ProductResponse getLatestProducts();
-
-    List<VariantDTO> addAllVariant(Long productId, List<String> attributeTypeIdList);
-
-    List<VariantDTO> addAllCustomVariant(Long productId, Map<String, List<String>> selectedAttributes);
 
 }

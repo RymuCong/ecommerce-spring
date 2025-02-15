@@ -52,6 +52,13 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
+    public AttributeDTO getAttributeById(String attributeId) {
+        Attribute attribute = attributeRepository.findById(attributeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Attribute", "attributeId", attributeId));
+        return ManualMapper.toAttributeDTO(attribute);
+    }
+
+    @Override
     public AttributeDTO updateAttribute(String attributeId, String value) {
         Attribute attribute = attributeRepository.findById(attributeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Attribute", "attributeId", attributeId));
