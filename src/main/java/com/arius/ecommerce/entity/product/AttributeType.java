@@ -22,11 +22,13 @@ public class AttributeType extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String attributeTypeId;
 
+    @Column(length = 100)
     private String name;
 
+    @Column(length = 200)
     private String description;
 
-    @OneToMany(mappedBy = "attributeType")
+    @OneToMany(mappedBy = "attributeType", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Attribute> attributes;
 }

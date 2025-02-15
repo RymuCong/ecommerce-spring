@@ -2,6 +2,7 @@ package com.arius.ecommerce.dto.response;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class BaseResponse {
+public class BaseResponse implements Serializable {
     private Long createdBy;
     private Long updatedBy;
     private LocalDateTime createdAt;

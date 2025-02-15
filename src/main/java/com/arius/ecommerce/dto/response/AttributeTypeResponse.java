@@ -1,12 +1,10 @@
 package com.arius.ecommerce.dto.response;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.arius.ecommerce.dto.AttributeTypeDTO;
+import lombok.Getter;
+import lombok.Setter;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class AttributeTypeResponse extends BaseResponse {
-    private String attributeTypeId;
-    private String name;
-    private String description;
+@Getter
+@Setter
+public class AttributeTypeResponse extends BasePagination<AttributeTypeDTO> {
 }

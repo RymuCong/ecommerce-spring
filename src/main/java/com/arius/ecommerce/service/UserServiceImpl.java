@@ -18,6 +18,7 @@ import com.arius.ecommerce.repository.RoleRepository;
 import com.arius.ecommerce.repository.UserRepository;
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.security.JwtUtils;
+import com.arius.ecommerce.security.UserPrincipal;
 import com.arius.ecommerce.utils.CommonMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.usermodel.*;
@@ -31,6 +32,7 @@ import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -62,10 +64,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getCurrentUser() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findByEmail(userPrincipal.getUsername());
+    }
+
+    @Override
     public AuthResponse loginUser(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
         if (user == null) {
-//            throw new NotFoundUserException("User not found");
             throw new APIException("User not found");
         }
 

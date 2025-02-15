@@ -1,25 +1,18 @@
 package com.arius.ecommerce.service;
 
-import com.arius.ecommerce.dto.AttributeDTO;
-import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.VariantDTO;
-import com.arius.ecommerce.dto.response.AttributeResponseDTO;
-import com.arius.ecommerce.dto.response.AttributeTypeResponse;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.Cart;
 import com.arius.ecommerce.entity.Category;
-import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.entity.product.Attribute;
-import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.entity.product.Variant;
 import com.arius.ecommerce.exception.ResourceNotFoundException;
 import com.arius.ecommerce.repository.*;
-import com.arius.ecommerce.security.UserPrincipal;
 import com.arius.ecommerce.utils.CommonMapper;
 import com.arius.ecommerce.utils.ElasticsearchMapper;
 import com.arius.ecommerce.utils.ManualMapper;
@@ -30,12 +23,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,32 +39,23 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final CartRepository cartRepository;
     private final AttributeRepository attributeRepository;
-    private final AttributeTypeRepository attributeTypeRepository;
     private final VariantRepository variantRepository;
-    private final UserRepository userRepository;
     private final S3Service s3Service;
     private final CartService cartService;
     private final ElasticsearchIndexService elasticsearchIndexService;
     private final SearchService searchService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, AttributeRepository attributeRepository, AttributeTypeRepository attributeTypeRepository, VariantRepository variantRepository, UserRepository userRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CartRepository cartRepository, AttributeRepository attributeRepository, VariantRepository variantRepository, S3Service s3Service, CartService cartService, ElasticsearchIndexService elasticsearchIndexService, SearchService searchService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.cartRepository = cartRepository;
         this.attributeRepository = attributeRepository;
-        this.attributeTypeRepository = attributeTypeRepository;
         this.variantRepository = variantRepository;
-        this.userRepository = userRepository;
         this.s3Service = s3Service;
         this.cartService = cartService;
         this.elasticsearchIndexService = elasticsearchIndexService;
         this.searchService = searchService;
-    }
-
-    private User getCurrentUser() {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findByEmail(userPrincipal.getUsername());
     }
 
     @Override
@@ -260,42 +242,6 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
         return productResponse;
-    }
-
-    @Override
-    public AttributeResponseDTO addAttribute(AttributeDTO attributeDTO) {
-        Attribute attribute = new Attribute();
-        User user = getCurrentUser();
-        attribute.setValue(attributeDTO.getValue());
-        AttributeType attributeType = attributeTypeRepository.findById(attributeDTO.getAttributeTypeId())
-                .orElseThrow(() -> new ResourceNotFoundException("AttributeType", "attributeTypeId", attributeDTO.getAttributeTypeId()));
-        attribute.setAttributeType(attributeType);
-        attribute.setCreatedBy(user);
-        attribute.setUpdatedBy(user);
-        attribute.setCreatedAt(LocalDateTime.now());
-        attribute.setUpdatedAt(LocalDateTime.now());
-        attributeRepository.save(attribute);
-        AttributeResponseDTO saved_attributeDTO = ManualMapper.toAttributeResponseDTO(attribute);
-        saved_attributeDTO.setUpdatedBy(user.getUserId());
-        saved_attributeDTO.setCreatedBy(user.getUserId());
-        return saved_attributeDTO;
-    }
-
-    @Override
-    public AttributeTypeResponse addAttributeType(AttributeTypeDTO attributeTypeDTO) {
-        AttributeType attributeType = new AttributeType();
-        User user = getCurrentUser();
-        attributeType.setName(attributeTypeDTO.getName());
-        attributeType.setDescription(attributeTypeDTO.getDescription());
-        attributeType.setCreatedBy(user);
-        attributeType.setUpdatedBy(user);
-        attributeType.setCreatedAt(LocalDateTime.now());
-        attributeType.setUpdatedAt(LocalDateTime.now());
-        attributeTypeRepository.save(attributeType);
-        AttributeTypeResponse saved_attributeTypeDTO = ManualMapper.toAttributeTypeResponse(attributeType);
-        saved_attributeTypeDTO.setUpdatedBy(user.getUserId());
-        saved_attributeTypeDTO.setCreatedBy(user.getUserId());
-        return saved_attributeTypeDTO;
     }
 
     @Override

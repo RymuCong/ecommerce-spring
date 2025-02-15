@@ -5,13 +5,9 @@ import com.arius.ecommerce.dto.request.LoginRequest;
 import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.request.UserRequest;
-import com.arius.ecommerce.dto.response.AttributeResponseDTO;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.entity.*;
-import com.arius.ecommerce.entity.product.Attribute;
-import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.entity.product.Product;
-import com.arius.ecommerce.entity.product.Variant;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -64,12 +60,6 @@ public interface CommonMapper {
     ProductDTO toProductDTO(ProductDocument productDocument);
 
     UserRequest toUserRequest(User user);
-
-    AttributeType toAttributeType(AttributeTypeDTO attributeTypeDTO);
-
-    VariantDTO toVariantDTO(Variant variant);
-
-    Variant toVariant(VariantDTO variantDTO);
 
     default Set<Role> map(List<String> roles) {
         if (roles == null) {

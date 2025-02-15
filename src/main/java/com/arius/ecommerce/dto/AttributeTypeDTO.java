@@ -1,13 +1,14 @@
 package com.arius.ecommerce.dto;
 
-import lombok.*;
+import com.arius.ecommerce.dto.response.BaseResponse;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class AttributeTypeDTO {
-    String name;
-    String description;
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class AttributeTypeDTO extends BaseResponse {
+    private String attributeTypeId;
+    private String name;
+    private String description;
+    private String[] attributeIds;
 }

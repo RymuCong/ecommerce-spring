@@ -1,36 +1,47 @@
 package com.arius.ecommerce.utils;
 
 import com.arius.ecommerce.dto.VariantDTO;
-import com.arius.ecommerce.dto.response.AttributeResponseDTO;
-import com.arius.ecommerce.dto.response.AttributeTypeResponse;
+import com.arius.ecommerce.dto.AttributeDTO;
+import com.arius.ecommerce.dto.AttributeTypeDTO;
 import com.arius.ecommerce.entity.product.Attribute;
 import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.entity.product.Variant;
 
 public class ManualMapper {
 
-    public static AttributeResponseDTO toAttributeResponseDTO(Attribute attribute) {
-        AttributeResponseDTO attributeResponseDTO = new AttributeResponseDTO();
-        attributeResponseDTO.setAttributeId(attribute.getAttributeId());
-        attributeResponseDTO.setCreatedBy(attribute.getCreatedBy().getUserId());
-        attributeResponseDTO.setCreatedAt(attribute.getCreatedAt());
-        attributeResponseDTO.setUpdatedBy(attribute.getUpdatedBy().getUserId());
-        attributeResponseDTO.setUpdatedAt(attribute.getUpdatedAt());
-        attributeResponseDTO.setValue(attribute.getValue());
-        attributeResponseDTO.setAttributeTypeId(attribute.getAttributeType().getAttributeTypeId());
-        return attributeResponseDTO;
+    public static AttributeDTO toAttributeDTO(Attribute attribute) {
+        AttributeDTO attributeDTO = new AttributeDTO();
+        attributeDTO.setAttributeId(attribute.getAttributeId());
+        if (attribute.getCreatedBy() != null) {
+            attributeDTO.setCreatedBy(attribute.getCreatedBy().getUserId());
+        }
+        attributeDTO.setCreatedAt(attribute.getCreatedAt());
+        if (attribute.getUpdatedBy() != null) {
+            attributeDTO.setUpdatedBy(attribute.getUpdatedBy().getUserId());
+        }
+        attributeDTO.setUpdatedAt(attribute.getUpdatedAt());
+        attributeDTO.setValue(attribute.getValue());
+        attributeDTO.setAttributeTypeId(attribute.getAttributeType().getAttributeTypeId());
+        return attributeDTO;
     }
 
-    public static AttributeTypeResponse toAttributeTypeResponse(AttributeType attributeType) {
-        AttributeTypeResponse attributeTypeResponse = new AttributeTypeResponse();
-        attributeTypeResponse.setAttributeTypeId(attributeType.getAttributeTypeId());
-        attributeTypeResponse.setName(attributeType.getName());
-        attributeTypeResponse.setDescription(attributeType.getDescription());
-        attributeTypeResponse.setCreatedBy(attributeType.getCreatedBy().getUserId());
-        attributeTypeResponse.setCreatedAt(attributeType.getCreatedAt());
-        attributeTypeResponse.setUpdatedBy(attributeType.getUpdatedBy().getUserId());
-        attributeTypeResponse.setUpdatedAt(attributeType.getUpdatedAt());
-        return attributeTypeResponse;
+    public static AttributeTypeDTO toAttributeTypeDTO(AttributeType attributeType) {
+        AttributeTypeDTO attributeTypeDTO = new AttributeTypeDTO();
+        attributeTypeDTO.setAttributeTypeId(attributeType.getAttributeTypeId());
+        attributeTypeDTO.setName(attributeType.getName());
+        attributeTypeDTO.setDescription(attributeType.getDescription());
+        if (attributeType.getCreatedBy() != null) {
+            attributeTypeDTO.setCreatedBy(attributeType.getCreatedBy().getUserId());
+        }
+        attributeTypeDTO.setCreatedAt(attributeType.getCreatedAt());
+        if (attributeType.getUpdatedBy() != null) {
+            attributeTypeDTO.setUpdatedBy(attributeType.getUpdatedBy().getUserId());
+        }
+        attributeTypeDTO.setUpdatedAt(attributeType.getUpdatedAt());
+        if (attributeType.getAttributes() != null && !attributeType.getAttributes().isEmpty()) {
+            attributeTypeDTO.setAttributeIds(attributeType.getAttributes().stream().map(Attribute::getAttributeId).toArray(String[]::new));
+        }
+        return attributeTypeDTO;
     }
 
     public static VariantDTO toVariantDTO(Variant variant) {
