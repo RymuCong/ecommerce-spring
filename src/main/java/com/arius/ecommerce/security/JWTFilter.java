@@ -25,14 +25,18 @@ import java.time.LocalDateTime;
 @Component
 public class JWTFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
+
+    private final CustomUserDetailService userDetailService;
+
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    private CustomUserDetailService userDetailService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    public JWTFilter(JwtUtils jwtUtils, CustomUserDetailService userDetailService, ObjectMapper objectMapper) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailService = userDetailService;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

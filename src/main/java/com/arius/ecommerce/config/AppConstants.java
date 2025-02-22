@@ -14,7 +14,10 @@ public class AppConstants {
     public static final String[] PUBLIC_URLS = {"/api/auth/**", "/api/public/**"};
     public static final String[] ADMIN_URLS = {"/api/admin/**"};
     public static final String[] USER_URLS = {"/api/user/**"};
-    public static final long JWT_VALIDITY = 1000 * 60 * 60 * 5; // 5 hours
+    public static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 1 day
+    public static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 30; // 1 month
+    public static final String accessKey = "0W/nxMQNBP4H4VmAXtTVlFLOfci3QGU4mf6CUf4tXQnCf0xOwlSSUHXlUdykreEcnklktHo9E6Qc42albAX51Q==";
+    public static final String refreshKey = "lNvZJvw71nGNzjLohy6UkuTspMO2uG30RWrRWhJpV6xrp1czOIFNeJcbJ8i9yRHKjeRc7F2uqNxkiCB0IAmG/w==";
+    public static final String DOMAIN = "localhost";
     public static final int DEFAULT_SEARCH_SIZE = 100;
-
 }

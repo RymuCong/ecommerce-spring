@@ -3,6 +3,7 @@ package com.arius.ecommerce.security;
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.entity.Role;
 import com.arius.ecommerce.exception.TokenExpiredException;
+import com.arius.ecommerce.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,26 +11,24 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class JwtUtils {
 
-    private final String secretKey;
+    private final RedisService redisService;
 
-    public JwtUtils(@Value("${jwt.secretKey}") String secretKey) {
-        this.secretKey = secretKey;
+    public JwtUtils(RedisService redisService) {
+        this.redisService = redisService;
     }
+
+    // uncomment this constructor if you want to generate a new secret key
 
 //    public JwtUtils(){
 //        secretKey = generateSecretKey();
@@ -46,8 +45,10 @@ public class JwtUtils {
 //        }
 //    }
 
-    public SecretKey getKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+    // end of comment
+
+    public SecretKey getKey(String key){
+        byte[] keyBytes = Decoders.BASE64.decode(key);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -60,23 +61,33 @@ public class JwtUtils {
         return Jwts.builder()
                 .claims(claims)
                 .subject(name)
+                .id(UUID.randomUUID().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + AppConstants.JWT_VALIDITY))
-                .signWith(getKey())
+                .expiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_VALIDITY))
+                .signWith(getKey(AppConstants.accessKey))
+                .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .id(UUID.randomUUID().toString())
+                .expiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_VALIDITY))
+                .signWith(getKey(AppConstants.refreshKey))
                 .compact();
     }
 
     private Claims extractAllClaims(String token){
         try {
             return Jwts.parser()
-                    .verifyWith(getKey())
+                    .verifyWith(getKey(AppConstants.accessKey))
                     .build()
                     .parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException ex) {
             throw new TokenExpiredException("JWT token has expired");
         }
     }
-
 
     private <T> T extractClaim(String token, Function<Claims,T> claimsResolver){
         final Claims claims = extractAllClaims(token);
@@ -95,9 +106,26 @@ public class JwtUtils {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean validateToken(String token, UserDetails userDetails){
-        final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token, UserDetails userDetails) {
+        try {
+            final String userName = extractUserName(token);
+
+            // Check if token is blacklisted
+            Claims claims = Jwts.parser()
+                    .verifyWith(getKey(AppConstants.accessKey))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            String jwtId = claims.getId();
+            if (redisService.get(jwtId) != null) {
+                throw new TokenExpiredException("Token is blacklisted");
+            }
+
+            return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e) {
+            throw new TokenExpiredException("Invalid token");
+        }
     }
 
     public String extractToken(HttpServletRequest request){
@@ -108,6 +136,54 @@ public class JwtUtils {
         return null;
     }
 
+    public boolean validateRefreshToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getKey(AppConstants.refreshKey))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
+            String jwtId = claims.getId();
+            if (redisService.get(jwtId) != null) {
+                throw new TokenExpiredException("Token is blacklisted");
+            }
+
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                throw new TokenExpiredException("Token has expired");
+            }
+
+            return true;
+        } catch (Exception e) {
+            throw new TokenExpiredException("Invalid token");
+        }
+    }
+
+    public long extractTokenExpired(String token) {
+        try {
+            Date expirationDate = Jwts.parser()
+                    .verifyWith(getKey(AppConstants.refreshKey))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration();
+
+            long expirationTime = expirationDate.getTime();
+            long currentTime = System.currentTimeMillis();
+            return Math.max(expirationTime - currentTime, 0);
+        } catch (Exception e) {
+            throw new TokenExpiredException("Invalid token");
+        }
+    }
+
+    public String getEmailFromRefreshToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey(AppConstants.refreshKey))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 
 }

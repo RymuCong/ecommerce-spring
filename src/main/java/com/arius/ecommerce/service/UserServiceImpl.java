@@ -1,11 +1,9 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.*;
-import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
-import com.arius.ecommerce.dto.request.UserRequest;
+import com.arius.ecommerce.dto.request.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
-import com.arius.ecommerce.dto.request.LoginRequest;
-import com.arius.ecommerce.dto.request.RegisterRequest;
+import com.arius.ecommerce.dto.response.RefreshTokenResponse;
 import com.arius.ecommerce.dto.response.UserResponse;
 import com.arius.ecommerce.entity.Address;
 import com.arius.ecommerce.entity.CartItem;
@@ -20,7 +18,11 @@ import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.security.JwtUtils;
 import com.arius.ecommerce.security.UserPrincipal;
 import com.arius.ecommerce.utils.CommonMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,14 +56,16 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final CartService cartService;
+    private final RedisService redisService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, CartService cartService) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, CartService cartService, RedisService redisService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.cartService = cartService;
+        this.redisService = redisService;
     }
 
     @Override
@@ -70,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponse loginUser(LoginRequest loginRequest) {
+    public AuthResponse loginUser(LoginRequest loginRequest, HttpServletResponse response) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
         if (user == null) {
             throw new APIException("User not found");
@@ -93,10 +98,24 @@ public class UserServiceImpl implements UserService {
         }
 
         String token = null;
+        String refreshToken = null;
 
         if (auth.isAuthenticated()) {
+            refreshToken = jwtUtils.generateRefreshToken(loginRequest.getEmail());
             token = jwtUtils.generateToken(loginRequest.getEmail(), user.getRoles());
         }
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // true nếu chỉ cho gửi qua HTTPS
+        cookie.setDomain(AppConstants.DOMAIN);
+        cookie.setPath("/");
+        cookie.setMaxAge(14 * 24 * 60 * 60); // 2 tuần
+
+        response.addCookie(cookie);
 
         return new AuthResponse(token, "User logged in successfully", getReadUserDTO(user));
     }
@@ -119,6 +138,72 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         cartService.createCart(user.getEmail());
         return new AuthResponse(jwtUtils.generateToken(user.getEmail(), user.getRoles()), "User registered successfully", getReadUserDTO(user));
+    }
+
+    @Override
+    public RefreshTokenResponse refreshToken(String refreshToken) {
+        try {
+            if (refreshToken == null) {
+                throw new APIException("Invalid refresh token");
+            }
+
+            String email = jwtUtils.getEmailFromRefreshToken(refreshToken);
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                throw new APIException("User not found");
+            }
+
+            boolean isValid = jwtUtils.validateRefreshToken(refreshToken);
+            if (!isValid) {
+                throw new APIException("Invalid refresh token");
+            }
+
+            String newAccessToken = jwtUtils.generateToken(email, user.getRoles());
+
+            return RefreshTokenResponse.builder()
+                    .accessToken(newAccessToken)
+                    .userId(user.getUserId())
+                    .build();
+        } catch (Exception e) {
+            throw new APIException("Error refreshing token");
+        }
+    }
+
+    @Override
+    public void signOut(LogoutRequest request, HttpServletResponse response) {
+        try {
+            String email = jwtUtils.extractUserName(request.getAccessToken());
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                throw new APIException("User not found");
+            }
+
+            long accessTokenExp = jwtUtils.extractTokenExpired(request.getAccessToken());
+            if (accessTokenExp > 0) {
+                Claims claims = Jwts.parser()
+                        .verifyWith(jwtUtils.getKey(AppConstants.accessKey))
+                        .build()
+                        .parseSignedClaims(request.getAccessToken())
+                        .getPayload();
+
+                String jwtId = claims.getId();
+                redisService.save(jwtId, request.getAccessToken(), accessTokenExp, TimeUnit.MILLISECONDS);
+                user.setRefreshToken(null);
+                userRepository.save(user);
+                deleteRefreshTokenCookie(response);
+            }
+        } catch (Exception e) {
+            throw new APIException("Error signing out");
+        }
+    }
+
+    private void deleteRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     @Override

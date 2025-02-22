@@ -34,20 +34,20 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth->auth
-                        .requestMatchers(AppConstants.PUBLIC_URLS).permitAll()
-                        .requestMatchers(AppConstants.ADMIN_URLS).hasAuthority("ADMIN")
-                        .requestMatchers(AppConstants.USER_URLS).hasAnyAuthority("USER","ADMIN")
-                        .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,"BAD REQUEST");
-                }))
-                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .authorizeHttpRequests(auth->auth
+                .requestMatchers(AppConstants.PUBLIC_URLS).permitAll()
+                .requestMatchers(AppConstants.ADMIN_URLS).hasAuthority("ADMIN")
+                .requestMatchers(AppConstants.USER_URLS).hasAnyAuthority("USER","ADMIN")
+                .anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults())
+            .exceptionHandling(exception->exception.authenticationEntryPoint((request,response,authenticationException)->{
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"BAD REQUEST");
+            }))
+            .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(Customizer.withDefaults())
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .authenticationProvider(daoAuthenticationProvider());
 
-            http.cors(Customizer.withDefaults());
-            http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-            http.authenticationProvider(daoAuthenticationProvider());
         return http.build();
     }
 

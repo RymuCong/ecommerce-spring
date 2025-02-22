@@ -44,6 +44,9 @@ public class User {
     @Size(min = 3,message = "Password should be at least 3 Characters")
     private String password;
 
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    private String refreshToken;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_role",joinColumns = @JoinColumn(name = "user_id"),inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnore

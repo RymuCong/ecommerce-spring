@@ -1,9 +1,13 @@
 package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.dto.request.LoginRequest;
+import com.arius.ecommerce.dto.request.LogoutRequest;
 import com.arius.ecommerce.dto.request.RegisterRequest;
 import com.arius.ecommerce.dto.response.AuthResponse;
+import com.arius.ecommerce.dto.response.RefreshTokenResponse;
 import com.arius.ecommerce.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +26,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         System.err.println("Login request: " + loginRequest);
-        return ResponseEntity.ok(userService.loginUser(loginRequest));
+        return ResponseEntity.ok(userService.loginUser(loginRequest, response));
     }
 
     @PostMapping("/register")
@@ -42,5 +46,17 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@CookieValue(name = "refreshToken") String refreshToken) {
+        var result = userService.refreshToken(refreshToken);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody @Valid LogoutRequest request, HttpServletResponse response) {
+        userService.signOut(request, response);
+        return ResponseEntity.ok("Logout success");
     }
 }
