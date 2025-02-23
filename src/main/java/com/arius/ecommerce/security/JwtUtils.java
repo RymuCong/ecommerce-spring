@@ -123,7 +123,10 @@ public class JwtUtils {
             }
 
             return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (TokenExpiredException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw new TokenExpiredException("Invalid token");
         }
     }
@@ -155,15 +158,17 @@ public class JwtUtils {
             }
 
             return true;
+        } catch (TokenExpiredException e) {
+            throw e;
         } catch (Exception e) {
             throw new TokenExpiredException("Invalid token");
         }
     }
 
-    public long extractTokenExpired(String token) {
+    public long extractTokenExpired(String token, String key) {
         try {
             Date expirationDate = Jwts.parser()
-                    .verifyWith(getKey(AppConstants.refreshKey))
+                    .verifyWith(getKey(key))
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()

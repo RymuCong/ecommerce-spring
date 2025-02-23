@@ -3,6 +3,7 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
+import com.arius.ecommerce.dto.response.LoginResponse;
 import com.arius.ecommerce.dto.response.RefreshTokenResponse;
 import com.arius.ecommerce.dto.response.UserResponse;
 import com.arius.ecommerce.entity.Address;
@@ -117,7 +118,12 @@ public class UserServiceImpl implements UserService {
 
         response.addCookie(cookie);
 
-        return new AuthResponse(token, "User logged in successfully", getReadUserDTO(user));
+        return AuthResponse.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .message("User logged in successfully")
+                .userId(user.getUserId())
+                .build();
     }
 
     @Override
@@ -137,7 +143,11 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         cartService.createCart(user.getEmail());
-        return new AuthResponse(jwtUtils.generateToken(user.getEmail(), user.getRoles()), "User registered successfully", getReadUserDTO(user));
+        return AuthResponse.builder()
+                .accessToken(jwtUtils.generateToken(user.getEmail(), user.getRoles()))
+                .message("User registered successfully")
+                .userId(user.getUserId())
+                .build();
     }
 
     @Override
@@ -178,7 +188,7 @@ public class UserServiceImpl implements UserService {
                 throw new APIException("User not found");
             }
 
-            long accessTokenExp = jwtUtils.extractTokenExpired(request.getAccessToken());
+            long accessTokenExp = jwtUtils.extractTokenExpired(request.getAccessToken(), AppConstants.accessKey);
             if (accessTokenExp > 0) {
                 Claims claims = Jwts.parser()
                         .verifyWith(jwtUtils.getKey(AppConstants.accessKey))
@@ -188,10 +198,18 @@ public class UserServiceImpl implements UserService {
 
                 String jwtId = claims.getId();
                 redisService.save(jwtId, request.getAccessToken(), accessTokenExp, TimeUnit.MILLISECONDS);
-                user.setRefreshToken(null);
-                userRepository.save(user);
-                deleteRefreshTokenCookie(response);
+                // move refresh token into blacklist
+                jwtId = Jwts.parser()
+                        .verifyWith(jwtUtils.getKey(AppConstants.refreshKey))
+                        .build()
+                        .parseSignedClaims(user.getRefreshToken())
+                        .getPayload()
+                        .getId();
+                redisService.save(jwtId, user.getRefreshToken(), jwtUtils.extractTokenExpired(user.getRefreshToken(), AppConstants.refreshKey), TimeUnit.MILLISECONDS);
             }
+            user.setRefreshToken(null);
+            userRepository.save(user);
+            deleteRefreshTokenCookie(response);
         } catch (Exception e) {
             throw new APIException("Error signing out");
         }
@@ -378,12 +396,19 @@ public class UserServiceImpl implements UserService {
         Authentication auth = authenticationManager.authenticate(authToken);
 
         String token = null;
+        String refreshToken = null;
 
         if (auth.isAuthenticated()) {
+            refreshToken = jwtUtils.generateRefreshToken(loginRequest.getEmail());
             token = jwtUtils.generateToken(loginRequest.getEmail(), user.getRoles());
         }
 
-        return new AuthResponse(token, "Admin logged in successfully", getReadUserDTO(user));
+        return AuthResponse.builder()
+                .accessToken(token)
+                .refreshToken(refreshToken)
+                .message("Admin log ged in successfully")
+                .userId(user.getUserId())
+                .build();
     }
 
     @Override
@@ -402,7 +427,11 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(role);
 
         userRepository.save(user);
-        return new AuthResponse(jwtUtils.generateToken(user.getEmail(), user.getRoles()), "Admin registered successfully", getReadUserDTO(user));
+        return AuthResponse.builder()
+                .accessToken(jwtUtils.generateToken(user.getEmail(), user.getRoles()))
+                .message("Admin registered successfully")
+                .userId(user.getUserId())
+                .build();
     }
 
     @Override

@@ -27,20 +27,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        System.err.println("Login request: " + loginRequest);
         return ResponseEntity.ok(userService.loginUser(loginRequest, response));
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerHandler(@RequestBody RegisterRequest registerRequest){
-        System.err.println("Register request: " + registerRequest);
         return ResponseEntity.ok(userService.registerUser(registerRequest));
     }
 
     @PostMapping("/admin/login")
     public ResponseEntity<?> loginAdmin(@RequestBody LoginRequest loginRequest) {
         try {
-            System.err.println("Admin login request: " + loginRequest);
             AuthResponse user = userService.loginAdmin(loginRequest);
             return ResponseEntity.ok(user);
         } catch (Exception e) {

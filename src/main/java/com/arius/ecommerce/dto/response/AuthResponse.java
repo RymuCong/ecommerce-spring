@@ -1,13 +1,15 @@
 package com.arius.ecommerce.dto.response;
 
-import com.arius.ecommerce.dto.UserDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@AllArgsConstructor
-@Data
-public class AuthResponse {
-    private String token;
+import java.io.Serializable;
+
+@Getter
+@Setter
+@Builder
+public class AuthResponse implements Serializable {
+    private String accessToken;
+    private String refreshToken;
     private String message;
-    private UserDTO user;
+    private Long userId;
 }
