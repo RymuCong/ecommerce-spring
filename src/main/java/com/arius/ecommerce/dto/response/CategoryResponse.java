@@ -1,22 +1,14 @@
 package com.arius.ecommerce.dto.response;
 
 import com.arius.ecommerce.dto.CategoryDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse {
-
-    private List<CategoryDTO> categories;
-    private int pageNumber;
-    private int pageSize;
-    private long totalElements;
-    private int totalPages;
-    private boolean lastPage;
-
+public class CategoryResponse extends BasePagination<CategoryDTO> {
 }

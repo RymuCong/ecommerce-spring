@@ -3,7 +3,6 @@ package com.arius.ecommerce.service;
 import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
-import com.arius.ecommerce.dto.response.LoginResponse;
 import com.arius.ecommerce.dto.response.RefreshTokenResponse;
 import com.arius.ecommerce.dto.response.UserResponse;
 import com.arius.ecommerce.entity.Address;
@@ -109,14 +108,7 @@ public class UserServiceImpl implements UserService {
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
 
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // true nếu chỉ cho gửi qua HTTPS
-        cookie.setDomain(AppConstants.DOMAIN);
-        cookie.setPath("/");
-        cookie.setMaxAge(14 * 24 * 60 * 60); // 2 tuần
-
-        response.addCookie(cookie);
+        setCookie(response, "refreshToken", refreshToken, 14 * 24 * 60 * 60); // 2 tuần
 
         return AuthResponse.builder()
                 .accessToken(token)
@@ -140,14 +132,30 @@ public class UserServiceImpl implements UserService {
 
         Role role = roleRepository.findByRoleName(AppConstants.ROLE_USER);
         user.getRoles().add(role);
-
         userRepository.save(user);
         cartService.createCart(user.getEmail());
+
+        // Generate the refresh token after the user is saved
+        String refreshToken = jwtUtils.generateRefreshToken(registerRequest.getEmail());
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
         return AuthResponse.builder()
                 .accessToken(jwtUtils.generateToken(user.getEmail(), user.getRoles()))
+                .refreshToken(user.getRefreshToken())
                 .message("User registered successfully")
                 .userId(user.getUserId())
                 .build();
+    }
+
+    private void setCookie(HttpServletResponse response, String key, String value, int maxAge) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // true nếu chỉ cho gửi qua HTTPS
+        cookie.setDomain(AppConstants.DOMAIN);
+        cookie.setPath("/");
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 
     @Override
@@ -265,7 +273,7 @@ public class UserServiceImpl implements UserService {
         List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
 
         UserResponse userResponse = new UserResponse();
-        userResponse.setUsers(userDTOS);
+        userResponse.setData(userDTOS);
         userResponse.setPageNumber(pagedUser.getNumber());
         userResponse.setPageSize(pagedUser.getSize());
         userResponse.setTotalPages(pagedUser.getTotalPages());
@@ -517,7 +525,7 @@ public class UserServiceImpl implements UserService {
             workbook.close();
             List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
             UserResponse userResponse = new UserResponse();
-            userResponse.setUsers(userDTOS);
+            userResponse.setData(userDTOS);
             userResponse.setTotalElements(userDTOS.size());
             return userResponse;
 

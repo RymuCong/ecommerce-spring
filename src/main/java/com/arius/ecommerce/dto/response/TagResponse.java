@@ -1,21 +1,14 @@
 package com.arius.ecommerce.dto.response;
 
 import com.arius.ecommerce.dto.TagDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TagResponse {
-
-    private List<TagDTO> tags;
-    private int pageNumber;
-    private int pageSize;
-    private long totalElements;
-    private int totalPages;
-    private boolean lastPage;
+public class TagResponse extends BasePagination<TagDTO> {
 }

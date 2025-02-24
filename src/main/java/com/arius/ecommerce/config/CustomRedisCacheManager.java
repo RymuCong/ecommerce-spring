@@ -3,7 +3,6 @@ package com.arius.ecommerce.config;
 import com.arius.ecommerce.dto.response.ProductResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.Cache;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.support.SimpleValueWrapper;
 import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;

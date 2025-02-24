@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
         }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
+        productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
@@ -108,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
         }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
+        productResponse.setData(productDTOs);
         return productResponse;
     }
 
@@ -186,7 +186,7 @@ public class ProductServiceImpl implements ProductService {
         }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
+        productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());
@@ -225,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
         }).toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
+        productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
         productResponse.setTotalElements(pagedProducts.getTotalElements());

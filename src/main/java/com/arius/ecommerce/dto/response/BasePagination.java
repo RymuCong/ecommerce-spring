@@ -2,6 +2,7 @@ package com.arius.ecommerce.dto.response;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class BasePagination<T> {
+public class BasePagination<T> implements Serializable {
     private List<T> data;
     private int pageNumber;
     private int pageSize;

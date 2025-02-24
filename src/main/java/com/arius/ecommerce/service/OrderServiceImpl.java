@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         OrderResponse orderResponse = new OrderResponse();
-        orderResponse.setContent(orderDTOS);
+        orderResponse.setData(orderDTOS);
         orderResponse.setPageNumber(pagedOrders.getNumber());
         orderResponse.setPageSize(pagedOrders.getSize());
         orderResponse.setTotalElements(pagedOrders.getTotalElements());
@@ -174,7 +174,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         OrderResponse orderResponse = new OrderResponse();
-        orderResponse.setContent(orderDTOS);
+        orderResponse.setData(orderDTOS);
         orderResponse.setPageNumber(pageOrders.getNumber());
         orderResponse.setPageSize(pageOrders.getSize());
         orderResponse.setTotalElements(pageOrders.getTotalElements());

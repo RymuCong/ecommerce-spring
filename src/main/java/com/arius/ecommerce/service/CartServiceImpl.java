@@ -38,14 +38,14 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartDTO createCart(String email) {
+    public void createCart(String email) {
         User user = userRepository.findByEmail(email);
 
         if(user == null){
             throw new ResourceNotFoundException("User","email",email);
         }
 
-        Cart cart = cartRepository.findByUserUserId(user.getUserId());
+        Cart cart = cartRepository.findByUserEmail(user.getEmail());
 
         if(cart != null){
             throw new APIException("Cart already exists");
@@ -54,9 +54,7 @@ public class CartServiceImpl implements CartService{
         cart = new Cart();
         cart.setUser(user);
         cart.setTotalPrice(0L);
-        cart = cartRepository.save(cart);
-
-        return CommonMapper.INSTANCE.toCartDTO(cart);
+       cartRepository.save(cart);
     }
 
     @Override
@@ -67,7 +65,7 @@ public class CartServiceImpl implements CartService{
             throw new ResourceNotFoundException("User","email",userEmail);
         }
 
-        Cart cart = cartRepository.findByUserUserId(user.getUserId());
+        Cart cart = cartRepository.findByUserEmail(user.getEmail());
 
         if (cart == null) {
             cart = new Cart();

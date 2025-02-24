@@ -49,7 +49,7 @@ public class SearchService {
                 .toList();
 
         ProductResponse productResponse = new ProductResponse();
-        productResponse.setProducts(productDTOs);
+        productResponse.setData(productDTOs);
         productResponse.setPageNumber(searchRequestDTO.getPageNumber());
         productResponse.setPageSize(searchRequestDTO.getPageSize());
         productResponse.setTotalElements(Objects.requireNonNull(searchResponse.getHits().getTotalHits()).value);

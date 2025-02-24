@@ -78,7 +78,7 @@ public class TagServiceImpl implements TagService{
                 .toList();
 
         TagResponse tagResponse = new TagResponse();
-        tagResponse.setTags(tagDTOs);
+        tagResponse.setData(tagDTOs);
         tagResponse.setPageNumber(tagsPage.getNumber());
         tagResponse.setPageSize(tagsPage.getSize());
         tagResponse.setTotalElements(tagsPage.getTotalElements());
