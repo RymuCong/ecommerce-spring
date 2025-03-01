@@ -2,7 +2,7 @@ package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
 import com.arius.ecommerce.dto.TagDTO;
-import com.arius.ecommerce.dto.response.TagResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.entity.Tag;
 import com.arius.ecommerce.exception.APIException;
@@ -69,7 +69,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public TagResponse getAllTags(int page, int size, String sortBy, String sortDir) {
+    public BasePagination<TagDTO> getAllTags(int page, int size, String sortBy, String sortDir) {
         Pageable pageable = PageRequest.of(page, size, sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
         Page<Tag> tagsPage = tagRepository.findAll(pageable);
 
@@ -77,7 +77,7 @@ public class TagServiceImpl implements TagService{
                 .map(CommonMapper.INSTANCE::toTagDTO)
                 .toList();
 
-        TagResponse tagResponse = new TagResponse();
+        BasePagination<TagDTO> tagResponse = new BasePagination<TagDTO>();
         tagResponse.setData(tagDTOs);
         tagResponse.setPageNumber(tagsPage.getNumber());
         tagResponse.setPageSize(tagsPage.getSize());

@@ -1,7 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.CategoryDTO;
-import com.arius.ecommerce.dto.response.CategoryResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.Category;
 import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.exception.APIException;
@@ -41,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BasePagination<CategoryDTO> getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir) {
         //Sorting
         Sort sort = sortBy.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending():
                 Sort.by(sortBy).descending();
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
         //Converting Category to Category DTO
         List<CategoryDTO> categoryDTO = categories.stream().map(CommonMapper.INSTANCE::toCategoryDTO).toList();
 
-        CategoryResponse categoryResponse = new CategoryResponse();
+        BasePagination<CategoryDTO> categoryResponse = new BasePagination<CategoryDTO>();
 
         categoryResponse.setData(categoryDTO);
         categoryResponse.setPageNumber(pagedCategories.getNumber());

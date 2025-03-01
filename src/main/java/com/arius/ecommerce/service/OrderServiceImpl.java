@@ -1,7 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.OrderDTO;
-import com.arius.ecommerce.dto.response.OrderResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.*;
 import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.exception.APIException;
@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse getAllOrders(int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BasePagination<OrderDTO> getAllOrders(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
@@ -145,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
             throw new APIException("No Orders Placed yet");
         }
 
-        OrderResponse orderResponse = new OrderResponse();
+        BasePagination<OrderDTO> orderResponse = new BasePagination<OrderDTO>();
         orderResponse.setData(orderDTOS);
         orderResponse.setPageNumber(pagedOrders.getNumber());
         orderResponse.setPageSize(pagedOrders.getSize());
@@ -157,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse getOrdersByUser(String emailId, int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BasePagination<OrderDTO> getOrdersByUser(String emailId, int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
@@ -173,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
             throw new APIException("No Orders placed yet by the user " + emailId);
         }
 
-        OrderResponse orderResponse = new OrderResponse();
+        BasePagination<OrderDTO> orderResponse = new BasePagination<OrderDTO>();
         orderResponse.setData(orderDTOS);
         orderResponse.setPageNumber(pageOrders.getNumber());
         orderResponse.setPageSize(pageOrders.getSize());

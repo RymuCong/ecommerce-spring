@@ -74,4 +74,9 @@ public class ElasticsearchIndexService {
 
         elasticsearchOperations.save(document, indexCoordinates);
     }
+
+    public void deleteProduct(Long productId) {
+        IndexCoordinates indexCoordinates = IndexCoordinates.of("product");
+        elasticsearchOperations.delete(String.valueOf(productId), indexCoordinates);
+    }
 }

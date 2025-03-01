@@ -1,7 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.AttributeTypeDTO;
-import com.arius.ecommerce.dto.response.AttributeTypeResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.User;
 import com.arius.ecommerce.entity.product.AttributeType;
 import com.arius.ecommerce.exception.APIException;
@@ -58,7 +58,7 @@ public class AttributeTypeServiceImpl implements AttributeTypeService {
     }
 
     @Override
-    public AttributeTypeResponse getAllAttributeTypes(int page, int size, String sortBy, String sortDir) {
+    public BasePagination<AttributeTypeDTO> getAllAttributeTypes(int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageDetails = PageRequest.of(page, size, sort);
         System.out.println("pageDetails = " + pageDetails);
@@ -67,7 +67,7 @@ public class AttributeTypeServiceImpl implements AttributeTypeService {
                 .map(ManualMapper::toAttributeTypeDTO)
                 .collect(Collectors.toList());
 
-        AttributeTypeResponse response = new AttributeTypeResponse();
+        BasePagination<AttributeTypeDTO> response = new BasePagination<AttributeTypeDTO>();
         response.setData(attributeDTOs);
         response.setPageNumber(page);
         response.setPageSize(size);

@@ -1,7 +1,7 @@
 package com.arius.ecommerce.service;
 
 import com.arius.ecommerce.dto.ProductDTO;
-import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.elasticsearch.ProductDocument;
 import com.arius.ecommerce.elasticsearch.SearchService;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
@@ -15,6 +15,9 @@ import com.arius.ecommerce.utils.ElasticsearchMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -75,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getAllProducts(int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BasePagination<ProductDTO> getAllProducts(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sort);
         Page<Product> pagedProducts = productRepository.findAll(pageDetails);
@@ -88,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }).toList();
 
-        ProductResponse productResponse = new ProductResponse();
+        BasePagination<ProductDTO> productResponse = new BasePagination<>();
         productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
@@ -97,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getAllProducts() {
+    public BasePagination<ProductDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
         List<ProductDTO> productDTOs = products.stream().map(product -> {
             ProductDTO productDTO = CommonMapper.INSTANCE.toProductDTO(product);
@@ -107,11 +111,19 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }).toList();
 
-        ProductResponse productResponse = new ProductResponse();
+        BasePagination<ProductDTO> productResponse = new BasePagination<>();
         productResponse.setData(productDTOs);
         return productResponse;
     }
 
+    @Caching(
+            put = {
+                    @CachePut(cacheNames = "products", key = "#productId")
+            },
+            evict = {
+                    @CacheEvict(cacheNames = {"searchResults", "latestProducts"}, allEntries = true)
+            }
+    )
     @Override
     public ProductDTO updateProduct(Long productId, ProductDTO productDto, MultipartFile image) {
         Product savedProduct = productRepository.findById(productId)
@@ -133,6 +145,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product finalProduct = productRepository.save(savedProduct);
+
+        ProductDocument productDocument = ElasticsearchMapper.toProductDocument(finalProduct);
+        elasticsearchIndexService.save(productDocument);
+
         return CommonMapper.INSTANCE.toProductDTO(finalProduct);
     }
 
@@ -153,12 +169,12 @@ public class ProductServiceImpl implements ProductService {
         return CommonMapper.INSTANCE.toProductDTO(updatedProduct);
     }
 
+    @CacheEvict(cacheNames = {"products", "searchResults", "latestProducts"}, allEntries = true)
     @Override
     public ProductDTO deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        // Initialize the lazy-loaded collection
         Hibernate.initialize(product.getTags());
 
         List<Cart> cart = cartRepository.findCartsByProductId(productId);
@@ -167,12 +183,15 @@ public class ProductServiceImpl implements ProductService {
         if (product.getImage() != null && !product.getImage().isEmpty())
             s3Service.deleteProductImage(product.getImage());
 
+        // Delete from Elasticsearch
+        elasticsearchIndexService.deleteProduct(productId);
+
         productRepository.delete(product);
         return CommonMapper.INSTANCE.toProductDTO(product);
     }
 
     @Override
-    public ProductResponse getProductsByCategory(Long categoryId, int page, int size, String sortBy, String sortDir) {
+    public BasePagination<ProductDTO> getProductsByCategory(Long categoryId, int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Product> pagedProducts = productRepository.findByCategoryCategoryId(categoryId, pageable);
@@ -185,7 +204,7 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }).toList();
 
-        ProductResponse productResponse = new ProductResponse();
+        BasePagination<ProductDTO> productResponse = new BasePagination<>();
         productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());
@@ -200,8 +219,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse search(SearchRequestDTO searchRequestDTO) throws JsonProcessingException {
-        return searchService.searchNameAndDescription(searchRequestDTO);
+    public BasePagination<ProductDTO> search(SearchRequestDTO searchRequestDTO) throws JsonProcessingException {
+        BasePagination<ProductDTO> searched = searchService.searchNameAndDescription(searchRequestDTO);
+        searched.setCreatedAt(LocalDateTime.now());
+        return searched;
     }
 
     @Override
@@ -211,7 +232,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getLatestProducts() {
+    public BasePagination<ProductDTO> getLatestProducts() {
         Sort sort = Sort.by("createdAt").descending();
         Pageable pageDetails = PageRequest.of(0, 9, sort);
         Page<Product> pagedProducts = productRepository.findAll(pageDetails);
@@ -224,7 +245,7 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }).toList();
 
-        ProductResponse productResponse = new ProductResponse();
+        BasePagination<ProductDTO> productResponse = new BasePagination<>();
         productResponse.setData(productDTOs);
         productResponse.setPageNumber(pagedProducts.getNumber());
         productResponse.setPageSize(pagedProducts.getSize());

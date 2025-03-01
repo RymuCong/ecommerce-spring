@@ -1,6 +1,7 @@
 package com.arius.ecommerce.config;
 
-import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.dto.ProductDTO;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
@@ -30,15 +31,15 @@ public class CustomRedisCacheManager extends RedisCacheManager {
 
     @Override
     protected Cache decorateCache(Cache cache) {
-        if (cache instanceof RedisCache) {
-            RedisCache redisCache = (RedisCache) cache;
+        if (cache instanceof RedisCache redisCache) {
             return new RedisCache(redisCache.getName(), redisCache.getNativeCache(), redisCache.getCacheConfiguration()) {
                 @Override
                 public ValueWrapper get(Object key) {
                     ValueWrapper valueWrapper = super.get(key);
                     if (valueWrapper != null && valueWrapper.get() instanceof LinkedHashMap) {
                         ObjectMapper mapper = new ObjectMapper();
-                        return new SimpleValueWrapper(mapper.convertValue(valueWrapper.get(), ProductResponse.class));
+                        return new SimpleValueWrapper(mapper.convertValue(valueWrapper.get(),
+                                new com.fasterxml.jackson.core.type.TypeReference<BasePagination<ProductDTO>>() {}));
                     }
                     return valueWrapper;
                 }

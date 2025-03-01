@@ -2,7 +2,7 @@ package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.ProductDTO;
-import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.entity.product.Product;
 import com.arius.ecommerce.service.ProductService;
@@ -41,31 +41,31 @@ public class ProductController {
     }
 
     @GetMapping("/public/product")
-    public ResponseEntity<ProductResponse> getAllProducts(
+    public ResponseEntity<BasePagination<ProductDTO>> getAllProducts(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
             @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
             @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
     ){
-        ProductResponse productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy,sortDir);
+        BasePagination<ProductDTO> productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy,sortDir);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @GetMapping("/public/latest-products")
-    public ResponseEntity<ProductResponse> getLatestProducts(){
-        ProductResponse productResponse = productService.getLatestProducts();
+    public ResponseEntity<BasePagination<ProductDTO>> getLatestProducts(){
+        BasePagination<ProductDTO> productResponse = productService.getLatestProducts();
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @GetMapping("/public/product/category/{categoryId}")
-    public ResponseEntity<ProductResponse> getProductsByCategory(
+    public ResponseEntity<BasePagination<ProductDTO>> getProductsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
             @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortBy,
             @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_PRODUCTS_BY,required = false) String sortDir
     ){
-        ProductResponse productResponse = productService.getProductsByCategory(categoryId,pageNumber,pageSize, sortBy, sortDir);
+        BasePagination<ProductDTO> productResponse = productService.getProductsByCategory(categoryId,pageNumber,pageSize, sortBy, sortDir);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
@@ -105,7 +105,7 @@ public class ProductController {
     }
 
     @GetMapping("/public/product/search")
-    public ResponseEntity<ProductResponse> searchProducts(
+    public ResponseEntity<BasePagination<ProductDTO>> searchProducts(
             @RequestParam(name = "searchTerm") String searchTerm,
             @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
             @RequestParam(name = "pageSize", defaultValue = "12") int pageSize,
@@ -122,7 +122,7 @@ public class ProductController {
         searchRequestDTO.setSortBy(sortBy);
         searchRequestDTO.setOrder(SortOrder.fromString(sortDir));
 
-        ProductResponse productResponse = productService.search(searchRequestDTO);
+        BasePagination<ProductDTO> productResponse = productService.search(searchRequestDTO);
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }

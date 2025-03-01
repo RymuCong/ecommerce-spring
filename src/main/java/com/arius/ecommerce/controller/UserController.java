@@ -5,7 +5,7 @@ import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.request.RegisterForAdminRequest;
 import com.arius.ecommerce.dto.request.UserRequest;
 import com.arius.ecommerce.dto.response.LoginResponse;
-import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.service.UserService;
 import com.arius.ecommerce.utils.UserExcelExportUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,13 +34,13 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public ResponseEntity<UserResponse> getAllUsers(
+    public ResponseEntity<BasePagination<UserDTO>> getAllUsers(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
             @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_USER_BY,required = false) String sortBy,
             @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_DIR,required = false) String sortDir
     ){
-        UserResponse userResponse = userService.getAllUsers(pageNumber,pageSize,sortBy,sortDir);
+        BasePagination<UserDTO> userResponse = userService.getAllUsers(pageNumber,pageSize,sortBy,sortDir);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
@@ -103,7 +103,7 @@ public class UserController {
 
     @PostMapping("/admin/users/importExcelData")
     public ResponseEntity<?> importExcelData(@RequestPart("file") MultipartFile file) {
-        UserResponse savedUsers = userService.importDataInExcelFile(file);
+        BasePagination<UserDTO> savedUsers = userService.importDataInExcelFile(file);
         return new ResponseEntity<>(savedUsers, HttpStatus.OK);
     }
 

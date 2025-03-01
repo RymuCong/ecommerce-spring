@@ -2,7 +2,7 @@ package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.CategoryDTO;
-import com.arius.ecommerce.dto.response.CategoryResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.Category;
 import com.arius.ecommerce.service.CategoryService;
 import jakarta.validation.Valid;
@@ -30,13 +30,13 @@ public class CategoryController {
     }
 
     @GetMapping("/public/category")
-    public ResponseEntity<CategoryResponse> getCategories(
+    public ResponseEntity<BasePagination<CategoryDTO>> getCategories(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
             @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_CATEGORY_BY,required = false) String sortBy,
             @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_DIR,required = false) String sortDir
     ){
-        CategoryResponse categoryResponse = categoryService.getAllCategories(pageNumber,pageSize,sortBy,sortDir);
+        BasePagination<CategoryDTO> categoryResponse = categoryService.getAllCategories(pageNumber,pageSize,sortBy,sortDir);
 
         return new  ResponseEntity<>(categoryResponse,HttpStatus.OK);
     }

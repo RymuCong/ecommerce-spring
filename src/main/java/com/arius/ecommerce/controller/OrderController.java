@@ -2,7 +2,7 @@ package com.arius.ecommerce.controller;
 
 import com.arius.ecommerce.config.AppConstants;
 import com.arius.ecommerce.dto.OrderDTO;
-import com.arius.ecommerce.dto.response.OrderResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.security.JwtUtils;
 import com.arius.ecommerce.service.OrderService;
 import com.arius.ecommerce.utils.OrderStatus;
@@ -52,14 +52,14 @@ public class OrderController {
     }
 
     @GetMapping("/admin/orders")
-    public ResponseEntity<OrderResponse> getAllOrders(
+    public ResponseEntity<BasePagination<OrderDTO>> getAllOrders(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) int pageNumber,
             @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) int pageSize,
             @RequestParam(name = "sortBy",defaultValue = AppConstants.SORT_ORDER_BY,required = false) String sortBy,
             @RequestParam(name = "sortDir",defaultValue = AppConstants.SORT_DIR,required = false) String sortDir
     ){
 
-        OrderResponse orderResponse = orderService.getAllOrders(pageNumber,pageSize,sortBy,sortDir);
+        BasePagination<OrderDTO> orderResponse = orderService.getAllOrders(pageNumber,pageSize,sortBy,sortDir);
 
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
 
@@ -84,7 +84,7 @@ public class OrderController {
         String token = jwtUtils.extractToken(request);
         String emailId = jwtUtils.extractUserName(token);
 
-       OrderResponse orderResponse = orderService.getOrdersByUser(emailId,pageNumber,pageSize,sortBy,sortDir);
+       BasePagination<OrderDTO> orderResponse = orderService.getOrdersByUser(emailId,pageNumber,pageSize,sortBy,sortDir);
 
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
 

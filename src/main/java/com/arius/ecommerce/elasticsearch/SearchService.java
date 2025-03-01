@@ -1,7 +1,7 @@
 package com.arius.ecommerce.elasticsearch;
 
 import com.arius.ecommerce.dto.ProductDTO;
-import com.arius.ecommerce.dto.response.ProductResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.elasticsearch.search.SearchRequestDTO;
 import com.arius.ecommerce.elasticsearch.search.SearchUtil;
 import com.arius.ecommerce.utils.CommonMapper;
@@ -34,7 +34,7 @@ public class SearchService {
 
     @Cacheable(value = "searchResults", key = "#searchRequestDTO.searchTerm + '_' + #searchRequestDTO.pageNumber" +
             " + '_' + #searchRequestDTO.pageSize + '_' + #searchRequestDTO.sortBy + '_' + #searchRequestDTO.order")
-    public ProductResponse searchNameAndDescription(SearchRequestDTO searchRequestDTO) throws JsonProcessingException {
+    public BasePagination<ProductDTO> searchNameAndDescription(SearchRequestDTO searchRequestDTO) throws JsonProcessingException {
         SearchRequest requestDTO = SearchUtil.buildSearchRequest("product", searchRequestDTO);
         SearchResponse searchResponse = searchInternal(requestDTO);
 
@@ -48,13 +48,13 @@ public class SearchService {
                 .map(CommonMapper.INSTANCE::toProductDTO)
                 .toList();
 
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setData(productDTOs);
-        productResponse.setPageNumber(searchRequestDTO.getPageNumber());
-        productResponse.setPageSize(searchRequestDTO.getPageSize());
-        productResponse.setTotalElements(Objects.requireNonNull(searchResponse.getHits().getTotalHits()).value);
+        BasePagination<ProductDTO> basePagination = new BasePagination<>();
+        basePagination.setData(productDTOs);
+        basePagination.setPageNumber(searchRequestDTO.getPageNumber());
+        basePagination.setPageSize(searchRequestDTO.getPageSize());
+        basePagination.setTotalElements(Objects.requireNonNull(searchResponse.getHits().getTotalHits()).value);
 
-        return productResponse;
+        return basePagination;
     }
 
     private SearchResponse searchInternal(final SearchRequest request) {

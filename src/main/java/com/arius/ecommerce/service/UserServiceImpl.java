@@ -4,7 +4,7 @@ import com.arius.ecommerce.dto.*;
 import com.arius.ecommerce.dto.request.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.response.RefreshTokenResponse;
-import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.Address;
 import com.arius.ecommerce.entity.CartItem;
 import com.arius.ecommerce.entity.Role;
@@ -256,7 +256,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BasePagination<UserDTO> getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
@@ -272,7 +272,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
 
-        UserResponse userResponse = new UserResponse();
+        BasePagination<UserDTO> userResponse = new BasePagination<UserDTO>();
         userResponse.setData(userDTOS);
         userResponse.setPageNumber(pagedUser.getNumber());
         userResponse.setPageSize(pagedUser.getSize());
@@ -451,7 +451,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse importDataInExcelFile(MultipartFile file) throws APIException {
+    public BasePagination<UserDTO> importDataInExcelFile(MultipartFile file) throws APIException {
         // Check if file is empty
         if (file == null) {
             throw new NullPointerException("File is empty");
@@ -524,7 +524,7 @@ public class UserServiceImpl implements UserService {
             }
             workbook.close();
             List<UserDTO> userDTOS = users.stream().map(UserServiceImpl::getReadUserDTO).toList();
-            UserResponse userResponse = new UserResponse();
+            BasePagination<UserDTO> userResponse = new BasePagination<UserDTO>();
             userResponse.setData(userDTOS);
             userResponse.setTotalElements(userDTOS.size());
             return userResponse;

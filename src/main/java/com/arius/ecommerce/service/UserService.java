@@ -4,7 +4,7 @@ import com.arius.ecommerce.dto.UserDTO;
 import com.arius.ecommerce.dto.request.*;
 import com.arius.ecommerce.dto.response.AuthResponse;
 import com.arius.ecommerce.dto.response.RefreshTokenResponse;
-import com.arius.ecommerce.dto.response.UserResponse;
+import com.arius.ecommerce.dto.response.BasePagination;
 import com.arius.ecommerce.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ public interface UserService {
 
     UserDTO registerUserForAdmin(RegisterForAdminRequest registerForAdminRequest);
 
-    UserResponse getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir);
+    BasePagination<UserDTO> getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     List<UserDTO> getAllUsers();
 
@@ -43,5 +43,5 @@ public interface UserService {
 
     UserDTO getUserById(Long userId);
 
-    UserResponse importDataInExcelFile(MultipartFile file);
+    BasePagination<UserDTO> importDataInExcelFile(MultipartFile file);
 }
