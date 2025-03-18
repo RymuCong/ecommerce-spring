@@ -17,7 +17,7 @@ import java.util.Objects;
 @Table(name = "categories")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
+public class Category extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

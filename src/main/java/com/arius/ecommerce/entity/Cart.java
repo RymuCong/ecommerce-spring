@@ -16,7 +16,7 @@ import java.util.Objects;
 @Table(name = "carts")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cart {
+public class Cart extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

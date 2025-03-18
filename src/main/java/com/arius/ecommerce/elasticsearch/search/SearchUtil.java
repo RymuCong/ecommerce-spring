@@ -1,6 +1,5 @@
 package com.arius.ecommerce.elasticsearch.search;
 
-import com.arius.ecommerce.config.AppConstants;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;

@@ -3,17 +3,16 @@ package com.arius.ecommerce.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "addresses")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Address {
+public class Address extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

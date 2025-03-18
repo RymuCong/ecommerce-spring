@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "payment")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
