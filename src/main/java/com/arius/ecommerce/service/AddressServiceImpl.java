@@ -26,11 +26,11 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public AddressDTO createAddress(String emailId, Address address) {
-        User user = userRepository.findByEmail(emailId);
+    public AddressDTO createAddress(String email, Address address) {
+        User user = userRepository.findByEmail(email);
 
         if(user == null){
-            throw new ResourceNotFoundException("User","emailId",emailId);
+            throw new ResourceNotFoundException("User","email",email);
         }
 
         Address newAddress = new Address();

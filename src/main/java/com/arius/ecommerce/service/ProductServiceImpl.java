@@ -117,12 +117,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Caching(
-            put = {
-                    @CachePut(cacheNames = "products", key = "#productId")
-            },
-            evict = {
-                    @CacheEvict(cacheNames = {"searchResults", "latestProducts"}, allEntries = true)
-            }
+            put = {@CachePut(cacheNames = "products", key = "#productId")},
+            evict = {@CacheEvict(cacheNames = {"searchResults", "latestProducts"}, allEntries = true)}
     )
     @Override
     public ProductDTO updateProduct(Long productId, ProductDTO productDto, MultipartFile image) {
